@@ -1,10 +1,6 @@
-% Results and Discussion section.
-% \ref{sec:results} is the target of the validation sentence in the methods section.
-% Filter thresholds below are taken verbatim from the downstream-filter notebook.
-
-\begin{figure*}[!b]
+\begin{figure*}[!t]
   \centering
-  \includegraphics[width=0.90\textwidth]{figures/LP-FLARE-polytope-5at-10x.pdf}
+  \includegraphics[width=0.75\textwidth]{figures/LP-FLARE-polytope-5at-10x.pdf}
   \caption{Activation-feasible compositions from the LP screen, projected onto the
 eleven-element composition simplex. The left panel shows the \(10\times\)W
 feasible region, and the right panel the \(10\times\)EUROFER97 region, with feasible
@@ -105,7 +101,7 @@ ductility.
 
 \begin{figure}[H]
   \centering
-\includegraphics[width=0.75\linewidth]{figures/LP_FLARE_nim_fig2_subgraph1_categories.pdf}
+\includegraphics[width=0.7\linewidth]{figures/LP_FLARE_nim_fig2_subgraph1_categories.pdf}
 \caption{Candidate categories of Subgraph~1 on the composition simplex,
 with Alloy~A in blue, Alloy~B in maroon, Alloy~AB in goldenrod, and
 Intermediate in grey.}
@@ -124,9 +120,9 @@ met, with the plasma-facing candidates at one end and the structural
 candidates at the other. The graded-path design of the next section is built on this classified region.
 
 \label{subsec:classification}
-\begin{figure*}[b]
+\begin{figure*}[t]
   \centering
-  \includegraphics[width=0.80\textwidth]{figures/LP_FLARE_nim_fig3_subgraph1_properties.pdf}
+  \includegraphics[width=0.8\textwidth]{figures/LP_FLARE_nim_fig3_subgraph1_properties.pdf}
   \caption{CALPHAD properties across the largest connected subgraph, projected
   onto the composition simplex: (a) Pugh ratio (\(B/G\)) and (b) solidus
   temperature.}
@@ -134,29 +130,49 @@ candidates at the other. The graded-path design of the next section is built on 
 \end{figure*}
 
 
-\subsection{Doubly-Monotonic Path Planning}
+
+
+\subsection{Doubly Monotonic Path Planning}
 \label{subsec:path}
+
 The design question is whether the two regions identified in
 Section~\ref{subsec:classification} can be joined by a compositional
 gradient whose properties evolve in one direction only, so that no interior
 layer of the graded wall is hotter-melting than the layer in front of it or
-less ductile than the layer behind it. This is posed as a path problem on the traversal graph of
-Subgraph~1, with terminals restricted to deployable multi-component alloys
-of at least three constituents and no single element above \(90\)~at.\%.
-Without this restriction, the property extrema are the pure elements, and the
-design degenerates to a trivial W\(\to\)V elemental gradient anchored by
-non-deployable terminals. Within the deployable pools (\(147\) plasma-facing
-and \(342\) structural candidates), the plasma-facing terminal is taken as
+less ductile than the layer behind it. This requirement follows the service
+profile of the wall. The temperature falls monotonically from the
+plasma-facing surface toward the coolant, so a solidus that falls in step
+with it keeps every layer's melting capability matched to the temperature it
+actually faces, whereas a solidus dip partway through the wall would leave an
+interior layer with reduced melting margin at a depth still near the peak
+thermal load. A local decrease in ductility would likewise introduce a less
+ductile interlayer within the graded structure, of the kind identified as
+failure origins in graded and joined
+transitions~\cite{fgmWsteelInterlayerBCC2023,kirk2021monotonic}. The two
+properties are also strongly anticorrelated across the design region
+(Figure~\ref{fig:categories}), so both cannot be high everywhere, and any
+wall spanning the two roles must trade one for the other through its
+thickness. Monotonicity ensures the trade proceeds in one direction only,
+matched to the one-way service profile of the wall. The design is posed as a path problem on the traversal graph of
+Subgraph~1, with terminals restricted to multi-component alloys of at least
+three constituents and no single element above \(90\)~at.\%. This
+restriction reflects the design intent of the search rather than a property
+screen. Multi-principal-element alloys are the target class of the program,
+with chemical disorder associated with irradiation
+tolerance~\cite{HEAnuclear2021,ElAtwani2019Radiation}, and pure tungsten in
+particular is excluded as a terminal because its brittleness is the very
+limitation that motivates alloyed plasma-facing
+materials~\cite{tungstenPFMreview2023}. Without the restriction the property
+extrema default to the pure elements and the design collapses to a binary
+W\(\to\)V elemental gradient. Within the restricted pools (\(147\)
+plasma-facing and \(342\) structural candidates), the plasma-facing terminal
+is taken as
 the maximum-solidus composition among the Alloy~A and AB candidates and the
 structural terminal as the maximum-Pugh composition among the Alloy~B and AB
 candidates. Monotonicity is enforced as a hard constraint by removing from the
 traversal graph every directed edge that raises the solidus or lowers the
 Pugh ratio, after which Dijkstra's algorithm returns the exact shortest path
-on what remains. The search objective is unweighted path
-length, so the formulation contains no tuning parameters, in contrast to
-penalized cost-function approaches in which monotonicity is promoted through a
-weight that must be selected~\cite{kirk2021monotonic}.
-
+on what remains.
 
 The resulting terminals are V\(_{5}\)Re\(_{5}\)W\(_{90}\) (solidus
 \(3449\)~K) for the plasma-facing role and Ti\(_{5}\)V\(_{90}\)Re\(_{5}\)
@@ -170,38 +186,44 @@ step, \(5\)~at.\% of one element is exchanged for another, the smallest
 possible move between neighboring compositions on the design grid. Every
 intermediate composition on the path satisfies the activation,
 phase-stability, and conductivity screens by construction. Eighteen
-steps is also the minimum conceivable for this terminal pair, since
-the tungsten content alone must change by eighteen lattice units, so the
-monotonicity requirement is achieved at zero cost in path length. The pruned
+steps is also the minimum conceivable for this terminal pair, since the
+tungsten content alone must change by \(90\)~at.\%, eighteen increments of
+the \(5\)~at.\% grid, so the monotonicity requirement is achieved at zero
+cost in path length. The pruned
 formulation, in which only \(2{,}030\) of the \(7{,}348\) directed
 transitions in Subgraph~1 survive, guarantees this by construction, as any
 shortest path on the pruned graph is monotone.
 
 \begin{figure}[H]
   \centering
-  \includegraphics[width=0.8\linewidth]{figures/LP_FLARE_nim_fig6_graded_path.pdf}
-  \caption{The shortest doubly-monotonic path (green) across the
-classified compositions of Subgraph~1, from the PFM terminal to the
-structural terminal on the composition simplex.
-Node colors follow Figure~\ref{fig:categories}.}
+  \includegraphics[width=0.7\linewidth]{figures/LP_FLARE_nim_fig6_graded_path.pdf}
+  \caption{The shortest doubly-monotonic path (green) across the classified compositions of Subgraph~1, from the PFM terminal to the structural terminal on the composition simplex. Node colors follow Figure~\ref{fig:categories}.}
   \label{fig:path}
 \end{figure}
 
-Fig.~\ref{fig:path-profiles} shows the property evolution along
+
+
+Figure~\ref{fig:path-profiles} shows the property evolution along
 this route. The solidus falls from \(3449\) to
 \(2195\)~K and the Pugh ratio rises from \(2.00\) to \(3.34\), with the
 largest solidus drops concentrated in the tungsten-rich early steps and the
 largest ductility gains toward the vanadium-rich end. The two curves cross
-their respective category thresholds within the Alloy~AB window, at steps 10 to 12 of the path.
+their respective category thresholds within the Alloy~AB window, at steps 10
+to 12 of the path. Although the path was designed on solidus and ductility
+alone, its coefficient of thermal expansion at \(600\)~\(^{\circ}\)C also
+proves monotonic, rising in nearly uniform steps from \(1.59\times10^{-5}\)
+to \(3.29\times10^{-5}\)~K\(^{-1}\) across the transition
+(Table~\ref{tab:path}), so that the property governing thermal-stress
+accumulation in graded builds~\cite{kirk2021monotonic} is graded smoothly as
+a consequence of the design rather than as an imposed constraint.
 
 \begin{figure}[H]
   \centering
   \includegraphics[width=1\linewidth]{figures/LP_FLARE_nim_fig7_path_property_profile.pdf}
-  \caption{Solidus temperature and Pugh ratio along the path, from the
-plasma-facing terminal (index~0) to the structural terminal (index~18). The
-solidus is non-increasing and the Pugh ratio non-decreasing at every step.}
+  \caption{Solidus temperature and Pugh ratio along the path, from the plasma-facing terminal (index~0) to the structural terminal (index~18). The solidus is non-increasing and the Pugh ratio non-decreasing at every step.}
   \label{fig:path-profiles}
 \end{figure}
+
 
 The \(18\) Alloy~AB compositions prove structurally essential to this result.
 A connectivity test on the pruned graph shows that no doubly-monotonic
@@ -219,42 +241,42 @@ and B categories in sequence.
 
 \begin{table*}[!t]
 \centering
-\caption{The shortest doubly-monotonic graded path: nineteen alloys connected by
+\caption{The shortest doubly-monotonic graded path, nineteen alloys connected by
 eighteen steps of a single 5~at.\% exchange each, from the plasma-facing terminal
 (index~0) to the structural terminal (index~18). The solidus is non-increasing
-and the Pugh ratio non-decreasing at every step; the three Alloy~AB compositions
-(indices 10-12) constitute the monotone gateway between the two categories.}
+and the Pugh ratio non-decreasing at every step, and the coefficient of thermal
+expansion at 600~$^{\circ}$C is likewise non-decreasing. The three Alloy~AB
+compositions (indices 10--12) constitute the monotone gateway between the two
+categories.}
 \label{tab:path}
-\begin{tabular}{clllcc}
+\begin{tabular}{clllccc}
 \toprule
-Index & Composition (at.\%) & Step & Solidus (K) & Pugh $B/G$ & Category \\
+Index & Composition (at.\%) & Step & Solidus (K) & Pugh $B/G$ & CTE ($10^{-5}$~K$^{-1}$) & Category \\
 \midrule
-0 & V$_{5}$Re$_{5}$W$_{90}$ & -- & 3449 & 2.00 & A \\
-1 & V$_{10}$Re$_{5}$W$_{85}$ & W\,$-5$, V\,$+5$ & 3292 & 2.05 & A \\
-2 & V$_{15}$Re$_{5}$W$_{80}$ & W\,$-5$, V\,$+5$ & 3157 & 2.10 & A \\
-3 & V$_{20}$Re$_{5}$W$_{75}$ & W\,$-5$, V\,$+5$ & 3045 & 2.15 & A \\
-4 & V$_{25}$Re$_{5}$W$_{70}$ & W\,$-5$, V\,$+5$ & 2951 & 2.21 & A \\
-5 & V$_{30}$Re$_{5}$W$_{65}$ & W\,$-5$, V\,$+5$ & 2871 & 2.27 & A \\
-6 & V$_{35}$Re$_{5}$W$_{60}$ & W\,$-5$, V\,$+5$ & 2802 & 2.33 & A \\
-7 & V$_{40}$Re$_{5}$W$_{55}$ & W\,$-5$, V\,$+5$ & 2741 & 2.40 & A \\
-8 & V$_{45}$Re$_{5}$W$_{50}$ & W\,$-5$, V\,$+5$ & 2686 & 2.47 & A \\
-9 & V$_{50}$Re$_{5}$W$_{45}$ & W\,$-5$, V\,$+5$ & 2635 & 2.54 & A \\
-10 & V$_{55}$Re$_{5}$W$_{40}$ & W\,$-5$, V\,$+5$ & 2588 & 2.62 & AB \\
-11 & V$_{60}$Re$_{5}$W$_{35}$ & W\,$-5$, V\,$+5$ & 2543 & 2.70 & AB \\
-12 & V$_{65}$Re$_{5}$W$_{30}$ & W\,$-5$, V\,$+5$ & 2500 & 2.78 & AB \\
-13 & V$_{70}$Re$_{5}$W$_{25}$ & W\,$-5$, V\,$+5$ & 2459 & 2.87 & B \\
-14 & V$_{75}$Re$_{5}$W$_{20}$ & W\,$-5$, V\,$+5$ & 2418 & 2.97 & B \\
-15 & V$_{80}$Re$_{5}$W$_{15}$ & W\,$-5$, V\,$+5$ & 2379 & 3.07 & B \\
-16 & V$_{85}$Re$_{5}$W$_{10}$ & W\,$-5$, V\,$+5$ & 2340 & 3.18 & B \\
-17 & Ti$_{5}$V$_{85}$Re$_{5}$W$_{5}$ & W\,$-5$, Ti\,$+5$ & 2253 & 3.23 & B \\
-18 & Ti$_{5}$V$_{90}$Re$_{5}$ & W\,$-5$, V\,$+5$ & 2195 & 3.34 & B \\
+0 & V$_{5}$Re$_{5}$W$_{90}$ & -- & 3449 & 2.00 & 1.59 & A \\
+1 & V$_{10}$Re$_{5}$W$_{85}$ & W\,$-5$, V\,$+5$ & 3292 & 2.05 & 1.69 & A \\
+2 & V$_{15}$Re$_{5}$W$_{80}$ & W\,$-5$, V\,$+5$ & 3157 & 2.10 & 1.78 & A \\
+3 & V$_{20}$Re$_{5}$W$_{75}$ & W\,$-5$, V\,$+5$ & 3045 & 2.15 & 1.88 & A \\
+4 & V$_{25}$Re$_{5}$W$_{70}$ & W\,$-5$, V\,$+5$ & 2951 & 2.21 & 1.97 & A \\
+5 & V$_{30}$Re$_{5}$W$_{65}$ & W\,$-5$, V\,$+5$ & 2871 & 2.27 & 2.07 & A \\
+6 & V$_{35}$Re$_{5}$W$_{60}$ & W\,$-5$, V\,$+5$ & 2802 & 2.33 & 2.16 & A \\
+7 & V$_{40}$Re$_{5}$W$_{55}$ & W\,$-5$, V\,$+5$ & 2741 & 2.40 & 2.26 & A \\
+8 & V$_{45}$Re$_{5}$W$_{50}$ & W\,$-5$, V\,$+5$ & 2686 & 2.47 & 2.35 & A \\
+9 & V$_{50}$Re$_{5}$W$_{45}$ & W\,$-5$, V\,$+5$ & 2635 & 2.54 & 2.45 & A \\
+10 & V$_{55}$Re$_{5}$W$_{40}$ & W\,$-5$, V\,$+5$ & 2588 & 2.62 & 2.54 & AB \\
+11 & V$_{60}$Re$_{5}$W$_{35}$ & W\,$-5$, V\,$+5$ & 2543 & 2.70 & 2.63 & AB \\
+12 & V$_{65}$Re$_{5}$W$_{30}$ & W\,$-5$, V\,$+5$ & 2500 & 2.78 & 2.73 & AB \\
+13 & V$_{70}$Re$_{5}$W$_{25}$ & W\,$-5$, V\,$+5$ & 2459 & 2.87 & 2.82 & B \\
+14 & V$_{75}$Re$_{5}$W$_{20}$ & W\,$-5$, V\,$+5$ & 2418 & 2.97 & 2.92 & B \\
+15 & V$_{80}$Re$_{5}$W$_{15}$ & W\,$-5$, V\,$+5$ & 2379 & 3.07 & 3.01 & B \\
+16 & V$_{85}$Re$_{5}$W$_{10}$ & W\,$-5$, V\,$+5$ & 2340 & 3.18 & 3.11 & B \\
+17 & Ti$_{5}$V$_{85}$Re$_{5}$W$_{5}$ & W\,$-5$, Ti\,$+5$ & 2253 & 3.23 & 3.19 & B \\
+18 & Ti$_{5}$V$_{90}$Re$_{5}$ & W\,$-5$, V\,$+5$ & 2195 & 3.34 & 3.29 & B \\
 \bottomrule
 \end{tabular}
 \end{table*}
 
-
-
-Fig.~\ref{fig:path-composition} shows the compositional simplicity
+Figure~\ref{fig:path-composition} shows the compositional simplicity
 of the path. Tungsten declines and vanadium rises together across sixteen
 consecutive exchanges, rhenium remains a constant \(5\)~at.\% from terminal
 to terminal, and titanium enters only in the final two layers as the tungsten
@@ -262,67 +284,15 @@ is exhausted. Although the path was searched
 in an eleven-element space, it engages only four elements, and at no point do
 more than four coexist. In practical terms, the entire gradient can be
 deposited from two varying feed streams against a constant rhenium addition,
-with a single titanium introduction near the structural end
+with a single titanium introduction near the structural end.
 
 
 \begin{figure}[H]
   \centering
   \includegraphics[width=0.9\linewidth]{figures/LP_FLARE_nim_fig8_path_composition_profile.pdf}
-  \caption{Elemental composition along the path: a tungsten-vanadium
-substitutional gradient at constant 5~at.\% Re, with Ti introduced in the
-final two layers as W is exhausted. Each step changes exactly one element pair
-by 5~at.\%.}
+  \caption{Elemental composition along the path: a tungsten-vanadium substitutional gradient at constant 5~at.\% Re, with Ti introduced in the final two layers as W is exhausted. Each step changes exactly one element pair by 5~at.\%.}
   \label{fig:path-composition}
 \end{figure}
 
 
-\subsection{ELM Assessment of the Graded Design}
-\label{subsec:elm}
 
-As a final assessment, the graded design is evaluated against transient
-edge-localized-mode (ELM) heat loading, the surface requirement that the
-equilibrium screens do not address. The assessment was carried out over all
-\(686\) compositions of Subgraph~1, so that the melting capability of the
-entire classified region is established rather than that of the path alone.
-For each composition, the peak surface temperature during an ELM pulse was
-computed from its CALPHAD-derived thermal properties
-(Section~\ref{subsec:elm-methods}), and the ELM melting margin was defined
-as the alloy solidus minus this peak temperature, so that a positive margin
-means the surface stays below melting.
-
-Fig.~\ref{fig:elm} shows the margin across the classified region. It
-ranges from \(-4140\) to \(+2229\)~K with a mean of \(-806\)~K, and \(114\)
-of the \(686\) compositions (\(17\%\)) remain positive. The margin
-correlates strongly with tungsten content, the passing compositions
-averaging \(57\)~at.\% W against \(12\)~at.\% W for those that fail, since
-tungsten raises the solidus that the surface temperature is measured
-against. The ELM-resistant set is not limited to near-pure
-tungsten. Tungsten alloyed with Ti, V, and Re retains a positive margin, and
-a small group of Cr-rich compositions also passes, eight of the thirty-one
-with at least \(50\)~at.\% Cr, so several compositional routes to ELM
-resistance exist within the region. The pass/fail boundary is sharp, with
-\(76\) compositions lying within \(\pm200\)~K of zero margin.
-
-\begin{figure*}[!t]
-  \centering
-  \includegraphics[width=0.80\textwidth]{figures/LP-FLARE-ELM-margin-panels.pdf}
-  \caption{ELM assessment across the largest connected subgraph, projected
-onto the composition simplex: (a) ELM melting margin and (b) the resulting
-pass/fail classification, with blue marking compositions of positive margin
-(pass) and maroon those of negative margin (fail).}
-  \label{fig:elm}
-\end{figure*}
-
-The graded path passes this test exactly where it must. Its plasma-facing
-terminal, V\(_{5}\)Re\(_{5}\)W\(_{90}\), carries a margin of \(+1650\)~K,
-placing it comfortably within the ELM-resistant set, and the margin
-decreases smoothly along the path, remaining positive through the first
-twelve layers, the entire Alloy~A segment and two of the three gateway
-compositions before crossing zero at the transition into the structural
-category. The ELM-resistant extent of the gradient therefore coincides with
-its plasma-facing function, as the layers that face the plasma withstand the
-transient while the structural layers behind them, shielded from surface
-loading, are not required to. The ELM assessment thus adds a third,
-independent line of evidence that converges with the activation and
-mechanical screens on the same separation of plasma-facing and structural
-materials, now traced layer by layer along the designed gradient.

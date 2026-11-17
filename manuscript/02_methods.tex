@@ -4,7 +4,7 @@
 
 The low-activation feasible space is defined over the eleven-element
 \ch{Cr-Fe-Hf-Mo-Nb-Re-Ta-Ti-V-W-Zr} system, sampled on a \(5\)~at.\% grid, using
-the \emph{FLARE} activation model~\cite{flare} together with linear programming.
+the \emph{FLARE} activation model~\cite{Marquez2026FLARE} together with linear programming.
 \emph{FLARE} is a reduced-order model that estimates the neutron-activation
 response of an alloy, gas generation, displacement damage, decay heat, and contact
 dose rate, as a composition-weighted sum of precomputed elemental contributions,
@@ -126,7 +126,7 @@ bulk to shear modulus, in the modern convention in which larger values
 indicate greater ductility~\cite{pugh1954,singh2023ductility}; this is the
 inverse of Pugh's original \(G/B\) formulation. For high-throughput
 evaluation, the elemental Poisson ratios \(\nu_i\) were combined by the rule
-of mixtures to give \(\bar{\nu}=\sum_i x_i \nu_i\), and the alloy Pugh ratio
+of mixtures to give \(\bar{\nu}=\sum_i x_i \nu_i\), where $x_i$ is the molar fraction of element $i$, and the alloy Pugh ratio
 was estimated through the isotropic relations \(E=3B(1-2\nu)\) and
 \(G=E/2(1+\nu)\), under which the bulk modulus cancels and the descriptor
 reduces to
@@ -135,7 +135,7 @@ reduces to
 \label{eq:pugh}
 \end{equation}
 a function of the composition-averaged Poisson ratio alone. A composition was
-classified as intrinsically ductile when \(B/G \ge 2.6\), a stricter cut than
+classified as intrinsically ductile when \(B/G \ge 2.6\), a stricter cutoff than
 the conventional \(B/G > 1.75\) criterion~\cite{singh2023ductility}. As a
 rule-of-mixtures prior, this descriptor serves as a screening-level estimate;
 first-principles or experimental validation of the selected compositions is
@@ -143,7 +143,7 @@ deferred to future work.
 
 
 \subsubsection{CALPHAD Thermodynamic Calculations}
- 
+
 The feasible alloy compositions were evaluated using the CALPHAD
 (CALculation of PHAse Diagrams) method to characterize their thermodynamic
 stability, phase constitution, melting behavior, and thermophysical
@@ -155,7 +155,7 @@ multicomponent alloys to be computed where direct experimental phase data do
 not exist. The method is widely employed for alloy design and phase-stability
 prediction in complex concentrated and refractory alloy
 systems~\cite{li2023calphad,conway2022thermodynamic}. Thermodynamic
-calculations were performed in Thermo-Calc using the TCHEA6 thermodynamic
+calculations were performed with high-throughput python scripts written with Thermo-Calc's TC-Python API using the TCHEA6 thermodynamic
 database, assessed specifically for high-entropy and refractory
 multi-principal-element systems. For each composition, the equilibrium state
 was obtained by global minimization of the total Gibbs free energy over the
@@ -172,155 +172,60 @@ capacity, thermal conductivity and resistivity, thermal diffusivity,
 electrical conductivity and resistivity, and thermal expansion, were obtained
 with the Equilibrium with Freeze-in temperature property model at the liquidus
 and solidus temperatures and at fixed temperatures spanning
-25--900~$^{\circ}\mathrm{C}$. The resulting phase-fraction, melting, and
+25-900~$^{\circ}\mathrm{C}$. The resulting phase-fraction, melting, and
 thermophysical data provide the temperature-dependent inputs for the property
-screens and the ELM melting-margin calculations that follow.
+screens and the Edge Localized Mode (ELM) melting-margin calculations that follow.
+
+%\subsection{Joinable Composition Regions}
+%\label{sec:joinable}
+%A graded transition requires a connected region of feasible composition space. To identify such regions, the compositions surviving the property filters were organized into a simplex-lattice graph, in which two compositions are neighbors when they differ by a single grid step, one element decreased and another increased by one increment~\cite{nimplex}. Graph representations of the design space have likewise been used within this framework for the design of compositionally graded structures~\cite{multiterminalCGA2024}. Constraints are imposed on the graph representation of the alloy design space by removing all edges connecting to nodes that do not pass. The remaining edges after this filtering procedure represent compositions capable of being joined in a graded alloy without violating design constraints. Because the filters remove compositions unevenly, this graph is generally not fully connected and separates into multiple connected components, regions within which any two compositions are joined by a continuous chain of single-step feasible neighbors. These components are the subgraphs, and the largest is carried forward as the design region, since it offers the widest contiguous space for a graded transition. For other more complex CGA design scenarios the choice of subgraph can prove to be less trivial, requiring a closer analysis of the property trends and characteristics of each subgraph \cite{obrist2026graph}.
+
+%Within this largest subgraph, the graded alloy is designed as a doubly-monotonic shortest path between two terminal compositions. Terminals are restricted to deployable multi-component alloys, requiring at least three constituents with no single element above \(90\)~at.\%, so that the design is anchored by realistic alloys rather than the pure-element property extrema. Within these pools, the plasma-facing terminal is the maximum-solidus composition among the high-solidus candidates and the structural terminal the maximum-Pugh composition among the ductile candidates. Monotonicity of the transition is enforced as a hard constraint on the graph itself. Each undirected lattice edge is expanded into its two directed transitions, and a directed edge \(u\!\to\!v\) is retained only if it does not increase the solidus and does not decrease the Pugh ratio, \(T_s(v)\le T_s(u)\) and \(B/G(v)\ge B/G(u)\), with all other transitions deleted. Dijkstra's algorithm with unit edge weights then returns the exact shortest path on the pruned directed graph. Because monotonicity is imposed by edge deletion rather than by a penalty term, the formulation contains no tuning parameters, in contrast to cost-function approaches in which monotonicity is promoted through a weight that must be selected~\cite{kirk2021monotonic}. A penalized fallback exists for terminal pairs disconnected by the strict pruning but was not required in this work. The returned path is verified independently of its construction by per-step assertions and by a loss-of-invariance metric, defined for each property as the summed magnitude of all counter-trend increments along the path, which is zero for a perfectly monotonic profile. Because each edge connects compositions separated by a single grid step and the path is confined to the property-acceptable subgraph, every intermediate composition of the graded transition remains feasible by construction.
+
 
 \subsection{Joinable Composition Regions}
 \label{sec:joinable}
 
 A graded transition requires a connected region of feasible composition
-space. To identify such regions, the compositions surviving the property
-filters were organized into a simplex-lattice graph, in which two
+space, and to identify such regions the compositions surviving the property
+filters of Section~\ref{subsec:subgraphs} were organized into a
+simplex-lattice graph, in which two
 compositions are neighbors when they differ by a single grid step, one
 element decreased and another increased by one increment~\cite{nimplex}.
 Graph representations of the design space have likewise been used within
 this framework for the design of compositionally graded
-structures~\cite{multiterminalCGA2024}. Because the filters remove
-compositions unevenly, this graph is generally not connected and separates
-into connected components, regions within which any
-two compositions are joined by a continuous chain of single-step feasible
-neighbors. These components are the subgraphs, and the largest is carried
-forward as the design region, since it offers the widest contiguous space
-for a graded transition.
+structures~\cite{multiterminalCGA2024}. Constraints are imposed on the graph
+representation of the alloy design space by removing the nodes that do not
+satisfy the property filters, together with their associated edges. The remaining edges after this filtering procedure
+represent allowable transitions between neighboring feasible compositions
+within the design constraints. Because the filters remove compositions
+unevenly, the resulting graph is generally disconnected and separates into
+multiple connected components, or subgraphs. The largest is carried forward
+as the design region because it offers the widest contiguous composition
+space for a graded transition. For other more complex CGA design scenarios the
+choice of subgraph can prove to be less trivial, requiring a closer analysis
+of the property trends and characteristics of each
+subgraph~\cite{obrist2026graph}.
 
 Within this largest subgraph, the graded alloy is designed as a
 doubly-monotonic shortest path between two terminal compositions. Terminals
-are restricted to deployable multi-component alloys, requiring at least
-three constituents with no single element above \(90\)~at.\%, so that the
-design is anchored by realistic alloys rather than the pure-element property
-extrema. Within these pools, the plasma-facing terminal is the
-maximum-solidus composition among the high-solidus candidates and the
-structural terminal the maximum-Pugh composition among the ductile
-candidates. Monotonicity of the transition is enforced as a hard constraint
-on the graph itself. Each undirected lattice edge is expanded into its two directed
-transitions, and a directed edge \(u\!\to\!v\) is retained only if it does
-not increase the solidus and does not decrease the Pugh ratio,
-\(T_s(v)\le T_s(u)\) and \(B/G(v)\ge B/G(u)\), with all other transitions
-deleted. Dijkstra's algorithm with unit edge weights then returns the exact
-shortest path on the pruned directed graph. Because monotonicity is imposed
-by edge deletion rather than by a penalty term, the formulation contains no
-tuning parameters, in contrast to cost-function approaches in which
-monotonicity is promoted through a weight that must be
-selected~\cite{kirk2021monotonic}. A penalized fallback exists for terminal
-pairs disconnected by the strict pruning but was not required in this work.
-The returned path is verified independently of its construction by per-step
-assertions and by a loss-of-invariance metric, defined for each property as
-the summed magnitude of all counter-trend increments along the path, which
-is zero for a perfectly monotonic profile. Because each edge connects
-compositions separated by a single grid step and the path is confined to the
-property-acceptable subgraph, every intermediate composition of the graded
-transition remains feasible by construction.
-
-
-
-\subsection{ELM Melting Margin Modeling}
-\label{subsec:elm-methods}
-
-To quantify the resistance of candidate alloys to transient plasma loading, the ELM melting margin was evaluated as the temperature difference between the alloy melting temperature and the peak surface temperature reached during an ELM-like heat pulse. The surface temperature rise was computed using a one-dimensional, semi-infinite slab approximation, which is valid when the thermal penetration depth during the pulse is much smaller than the sample thickness. The model considers a background heat flux upon which a high-intensity pulse is superimposed for a short duration. The input parameters used in the heat balance formulation are listed in
-Table~\ref{tab:ELM_params}.
-
-\begin{table}[H]
-\centering
-\caption{Input parameters used to compute heat balance during ELM transient loading.}
-\label{tab:ELM_params}
-\begin{tabularx}{\columnwidth}{Xl}
-\toprule
-\textbf{Parameter} & \textbf{Value} \\
-\midrule
-\mbox{Temperature on the cooling side, $T_{\mathrm{bot}}$} & \SI{415}{\kelvin}~\cite{VandenKerkhof2021,DeTemmerman2018} \\
-Steady-state power flux density, $Q_{\mathrm{SS}}$ & \SI{10}{\mega\watt\per\square\meter}~\cite{Pitts2019,VandenKerkhof2021} \\
-ELM energy density, $E_{\mathrm{ELM}}$ & \SI{0.2}{\mega\joule\per\square\meter}~\cite{Farid2015} \\
-Pulse duration, $t_{\mathrm{pulse}}$ & \SI{0.5}{\milli\second}~\cite{Farid2015,DeTemmerman2018} \\
-First wall thickness, $d$ & \SI{6}{\milli\meter}~\cite{VandenKerkhof2021,DeTemmerman2018} \\
-\bottomrule
-\end{tabularx}
-\end{table}
-
-
-The ELM heat flux was calculated as
-
-\vspace{0.2em}
-\begin{equation}
-Q_{\mathrm{ELM}}
-=
-\frac{E_{\mathrm{ELM}}}{t_{\mathrm{pulse}}}.
-\label{eq:elm_heat_flux}
-\end{equation}
-\vspace{0.2em}
-
-Material thermal properties, including thermal conductivity \(k\), mass-specific
-heat capacity \(c_p\), and density \(\rho\), were obtained from CALPHAD
-calculations at multiple temperatures. For each alloy, the effective properties
-were computed as the arithmetic mean of values across the temperature range, with
-molar heat capacity converted to mass-specific heat capacity using the alloy
-molecular weight. Density was evaluated at room temperature.
-
-The total surface temperature rise was calculated as the sum of steady-state and
-transient components. The steady-state temperature increase due to the continuous
-background heat flux was given by
-
-\vspace{0.2em}
-\begin{equation}
-\Delta T_{\mathrm{SS}}
-=
-\frac{Q_{\mathrm{SS}}\, d}{k},
-\label{eq:ss_temp_rise}
-\end{equation}
-\vspace{0.2em}
-
-representing the linear temperature gradient through the first-wall thickness.
-
-The transient temperature rise caused by the ELM pulse was modeled as
-
-\vspace{0.2em}
-\begin{equation}
-\Delta T_{\mathrm{ELM}}
-=
-\frac{2Q_{\mathrm{ELM}}}{k}
-\sqrt{\frac{\alpha t_{\mathrm{pulse}}}{\pi}},
-\label{eq:elm_temp_rise}
-\end{equation}
-\vspace{0.2em}
-
-where the thermal diffusivity is \(\alpha=k/(\rho c_p)\).
-
-The peak surface temperature was then obtained as
-
-\vspace{0.2em}
-\begin{equation}
-T_{\max}
-=
-T_{\mathrm{bot}}
-+
-\Delta T_{\mathrm{SS}}
-+
-\Delta T_{\mathrm{ELM}}.
-\label{eq:peak_temp}
-\end{equation}
-\vspace{0.2em}
-
-Finally, the ELM melting margin was defined as
-
-\vspace{0.2em}
-\begin{equation}
-T_{\mathrm{margin}}
-=
-T_m
--
-T_{\max},
-\label{eq:melting_margin}
-\end{equation}
-\vspace{0.2em}
-
-\noindent where \(T_m\) is the alloy solidus temperature.
+are restricted to multicomponent alloys containing at least three
+constituents, with no single element above \(90\)~at.\%, reflecting the
+multicomponent design intent of the search and excluding degenerate
+pure-element property extrema, with the full rationale given in
+Section~\ref{subsec:path}. Within these pools, the plasma-facing terminal is selected as the
+maximum-solidus composition among the high-solidus candidates, while the
+structural terminal is selected as the maximum-Pugh-ratio composition among
+the ductile candidates. Monotonicity of the transition is enforced as a hard constraint
+on the graph itself. Each undirected lattice edge is expanded into two directed
+transitions, and a transition between neighboring compositions is retained
+only if it neither increases the solidus temperature nor decreases the Pugh
+ratio. All other transitions are deleted. Dijkstra's algorithm with unit edge weights then returns the exact
+shortest path on the pruned directed graph.
+This graph formulation carries practical advantages over the
+sampling-based planning in which pathwise property monotonicity was
+introduced~\cite{kirk2021monotonic}. Every node property is computed once
+and stored with the graph, so the search queries no property model on the
+fly and needs no weighting parameter, returning a monotonic path
+exactly rather than approximately.
+A penalized fallback that minimizes monotonicity violations is retained for cases in which no strictly monotonic path exists, although it was not required here. The returned path is independently verified by per-step assertions and a loss-of-invariance metric, for which zero indicates a perfectly monotonic profile.
