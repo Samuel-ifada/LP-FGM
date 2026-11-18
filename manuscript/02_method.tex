@@ -56,10 +56,13 @@ together with the simplex condition \(\sum_i x_i = 1\) and the bounds
 \(\mathbf{G}\mathbf{x} \le \mathbf{h}\). The compositions satisfying every limit
 are exactly those inside the region enclosed by these surfaces, a convex polytope
 \begin{equation}
-P=\{\mathbf{x}\in\Delta : \mathbf{G}\mathbf{x}\le\mathbf{h}\},
+\begin{aligned}
+P &= \bigl\{\mathbf{x}\in\Delta \;:\; \mathbf{G}\mathbf{x}\le\mathbf{h}\bigr\},\\
+\Delta &= \Bigl\{\mathbf{x}\in\mathbb{R}^{N} \;:\; \textstyle\sum_{i} x_i = 1,\ x_i \ge 0\Bigr\},
+\end{aligned}
 \label{eq:polytope}
 \end{equation}
-where \(\Delta\) is the composition simplex.
+where \(\Delta\) is the composition simplex of the \(N=11\) elements.
 
 The feasible region is thus obtained directly as \(P\) by linear programming, and
 the \(5\)~at.\% grid compositions inside it are enumerated without evaluating the
@@ -145,8 +148,10 @@ Freeze-in Temperature property model.
 \textbf{Design region.} The activation-feasible compositions were first screened
 for single-phase BCC stability and heat removal, retaining a composition only if
 \begin{equation}
-f_{\mathrm{BCC}}(T) \ge 0.98 \quad (T = 500,\ 600,\ 650\ ^{\circ}\mathrm{C}),
-\qquad \kappa_{25\,^{\circ}\mathrm{C}} > 16~\mathrm{W\,m^{-1}\,K^{-1}},
+\begin{aligned}
+f_{\mathrm{BCC}}(T) &\ge 0.98, \qquad T \in \{500,\, 600,\, 650\}~\si{\celsius},\\
+\kappa(\SI{25}{\celsius}) &> \SI{16}{\watt\per\meter\per\kelvin},
+\end{aligned}
 \label{eq:filters}
 \end{equation}
 where \(f_{\mathrm{BCC}}\) is the BCC phase fraction and \(\kappa\) is the thermal
@@ -155,7 +160,7 @@ work~\cite{multiterminalCGA2024,obrist2026graph}, the surviving compositions wer
 organized into a simplex-lattice graph~\cite{nimplex}, in which two compositions
 \(u\) and \(v\) are neighbors when
 \begin{equation}
-\mathbf{x}_v-\mathbf{x}_u = 0.05\,(\mathbf{e}_b-\mathbf{e}_a), \qquad a \neq b,
+\mathbf{x}_v-\mathbf{x}_u = 0.05\,\bigl(\mathbf{e}_b-\mathbf{e}_a\bigr), \qquad a \neq b,
 \label{eq:edge}
 \end{equation}
 where \(\mathbf{e}_a\) is the unit vector of element \(a\). Each edge thus
@@ -170,12 +175,15 @@ region is classified by the requirements of the two sides of the first wall. A
 composition is a plasma-facing candidate, Material~A, or a structural candidate,
 Material~B, when
 \begin{equation}
-\text{A:}\ \ T_s > 2200~^{\circ}\mathrm{C}\ \text{and}\ \sigma_y^{600} \ge 300~\mathrm{MPa},
-\qquad
-\text{B:}\ \ B/G \ge 2.6\ \text{and}\ \sigma_y^{650} \ge 250~\mathrm{MPa},
+\begin{aligned}
+&\text{Material A:} && T_s > \SI{2200}{\celsius}
+  &&\text{and}\quad \sigma_y^{600} \ge \SI{300}{\mega\pascal},\\
+&\text{Material B:} && B/G \ge 2.6
+  &&\text{and}\quad \sigma_y^{650} \ge \SI{250}{\mega\pascal},
+\end{aligned}
 \label{eq:classes}
 \end{equation}
-where \(\sigma_y^{T}\) is the yield strength at \(T\)~\(^{\circ}\)C. The strength
+where \(\sigma_y^{T}\) is the yield strength at \(T\)~\si{\celsius}. The strength
 limits are set at the level of the reference structural steel
 EUROFER97~\cite{lindau2005eurofer}, so that every candidate is at least as strong as
 the steel it would replace at the service temperatures. Compositions satisfying
@@ -186,29 +194,38 @@ terminals are chosen by the function of each side of the wall. The plasma-facing
 (PFM) terminal is the highest-solidus composition of Material~A or AB, and the
 structural terminal is the highest-Pugh-ratio composition of Material~B or AB:
 \begin{equation}
-v_{\mathrm{PFM}} = \arg\max_{v \in A \cup AB} T_s(v), \qquad
-v_{\mathrm{str}} = \arg\max_{v \in B \cup AB} (B/G)(v).
+\begin{aligned}
+v_{\mathrm{PFM}} &= \operatorname*{arg\,max}_{v \,\in\, A \cup AB}\; T_s(v),\\
+v_{\mathrm{str}} &= \operatorname*{arg\,max}_{v \,\in\, B \cup AB}\; (B/G)(v).
+\end{aligned}
 \label{eq:ends}
 \end{equation}
 
-\textbf{Constraints.} A gradient path \(\sigma=(v_0,v_1,\dots,v_L)\), with
+\textbf{Constraints.} A gradient path \(\pi=(v_0,v_1,\dots,v_L)\), with
 \(v_0=v_{\mathrm{PFM}}\) and \(v_L=v_{\mathrm{str}}\), is a sequence of neighboring
 compositions, each step corresponding to one deposited layer. Every layer must be a
 design material, at least as strong as EUROFER97 at both service temperatures, and
 a multicomponent alloy. The admissible compositions, analogous to the free space
 \(Z_{\mathrm{free}}\) of Kirk et al.~\cite{kirk2018gradient}, are therefore
 \begin{equation}
-\mathcal{V} = \{\, v \in A \cup B \cup AB :\ \sigma_y^{600}(v) \ge 300~\mathrm{MPa},\
-\sigma_y^{650}(v) \ge 250~\mathrm{MPa},\ N_{\mathrm{el}}(v) \ge 3 \,\},
+\begin{aligned}
+\mathcal{V} = \bigl\{\, v \in A \cup B \cup AB \;:\;
+  & \sigma_y^{600}(v) \ge \SI{300}{\mega\pascal},\
+    \sigma_y^{650}(v) \ge \SI{250}{\mega\pascal},\\
+  & N_{\mathrm{el}}(v) \ge 3 \,\bigr\},
+\end{aligned}
 \label{eq:admissible}
 \end{equation}
 where \(N_{\mathrm{el}}\) is the number of constituent elements. In addition, two
 monotonicity constraints are imposed on every step \(u \to v\):
 \begin{equation}
-\alpha_T(v) \ge \alpha_T(u) \quad (T = 600,\ 650\ ^{\circ}\mathrm{C}),
-\qquad T_s(v) \le T_s(u).
+\begin{aligned}
+\alpha_T(v) &\ge \alpha_T(u), \qquad T \in \mathcal{T}=\{600,\, 650\}~\si{\celsius},\\
+T_s(v) &\le T_s(u),
+\end{aligned}
 \label{eq:monotone}
 \end{equation}
+where \(\alpha_T\) is the linear CTE at temperature \(T\).
 A monotonic CTE keeps the thermal-expansion mismatch at every interface in the same
 direction, from the low-expansion plasma-facing alloy to the higher-expansion
 structural alloy, so that no interlayer reverses the strain gradient across the
@@ -226,30 +243,38 @@ of Kirk et al.~\cite{kirk2021monotonic}, as applied by Hanagan
 et al.~\cite{hanagan2025sfe}, in which a monotonicity penalty is combined with a
 path-length term of small weight:
 \begin{equation}
-c(\sigma) = \mathrm{LOM}(\sigma) + w\,l(\sigma), \qquad w \ll 1.
+c(\pi) = \mathrm{LOM}(\pi) + w\,l(\pi), \qquad w \ll 1.
 \label{eq:cost}
 \end{equation}
 In the original formulation, the penalty for a property that must increase is its
 lack of increase (LOI), the negative part of its derivative along the path
 integrated over the path~\cite{hanagan2025sfe}. On the discrete graph, this becomes a
 sum over steps. Applied here to the CTE at both temperatures, which must increase,
-and to the solidus, which must decrease, the penalty and path length are
+and to the solidus, which must decrease, the penalty is
 \begin{equation}
-\mathrm{LOM}(\sigma)=\sum_{k=1}^{L}\Big[\sum_{T}\max\!\big(\alpha_T(v_{k-1})-\alpha_T(v_k),0\big)
-+\max\!\big(T_s(v_k)-T_s(v_{k-1}),0\big)\Big],
-\qquad
-l(\sigma)=\sum_{k=1}^{L}\lVert \mathbf{x}_{v_k}-\mathbf{x}_{v_{k-1}}\rVert_2 .
+\begin{split}
+\mathrm{LOM}(\pi) = \sum_{k=1}^{L} \Bigl[\,
+  & \sum_{T\in\mathcal{T}} \max\bigl(\alpha_T(v_{k-1})-\alpha_T(v_k),\,0\bigr)\\
+  & + \max\bigl(T_s(v_k)-T_s(v_{k-1}),\,0\bigr) \Bigr],
+\end{split}
 \label{eq:loi}
+\end{equation}
+and the path length in composition space is
+\begin{equation}
+l(\pi)=\sum_{k=1}^{L}\bigl\lVert \mathbf{x}_{v_k}-\mathbf{x}_{v_{k-1}}\bigr\rVert_2 .
+\label{eq:length}
 \end{equation}
 
 \textbf{Problem formulation and solution.} In summary, the gradient path design
 problem is defined as follows:
 \begin{equation}
 \begin{aligned}
-&\text{Find} \quad && \sigma^{*} = \arg\min_{\sigma}\ c(\sigma) \\
-&\text{subject to} \quad && v_k \in \mathcal{V}, \quad k = 0,\dots,L, \\
-& && v_0 = v_{\mathrm{PFM}}, \quad v_L = v_{\mathrm{str}}, \\
-& && \text{each step } v_{k-1} \to v_k \text{ satisfies \Cref{eq:edge,eq:monotone}}.
+&\text{Find}       && \pi^{*} = \operatorname*{arg\,min}_{\pi}\; c(\pi)\\
+&\text{subject to} && v_k \in \mathcal{V}, \quad k = 0,\dots,L,\\
+&                  && v_0 = v_{\mathrm{PFM}}, \quad v_L = v_{\mathrm{str}},\\
+&                  && \mathbf{x}_{v_k}-\mathbf{x}_{v_{k-1}} = 0.05\,\bigl(\mathbf{e}_b-\mathbf{e}_a\bigr),\\
+&                  && \alpha_T(v_k) \ge \alpha_T(v_{k-1}),\ T\in\mathcal{T},\\
+&                  && T_s(v_k) \le T_s(v_{k-1}), \quad k = 1,\dots,L.
 \end{aligned}
 \label{eq:problem}
 \end{equation}
@@ -258,7 +283,7 @@ Because the monotonicity constraints are imposed as hard constraints,
 exchange, \(l = 0.05\sqrt{2}\,L\), and the cost reduces to the number of steps. The
 design path is therefore the shortest monotonic path,
 \begin{equation}
-\sigma^{*} = \arg\min_{\sigma}\, L(\sigma),
+\pi^{*} = \operatorname*{arg\,min}_{\pi}\; L(\pi),
 \label{eq:shortest}
 \end{equation}
 which, as noted by Hanagan et al., also minimizes the number of layers required to
