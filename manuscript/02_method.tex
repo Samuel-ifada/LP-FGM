@@ -1,5 +1,5 @@
 \section{Methods}
-\subsection{Constraint-Based Neutronic Screening}
+\subsection{Activation Screening by Linear Programming}
 \label{sec:feasible-space}
 
 The low-activation feasible space is defined over the eleven-element
@@ -70,163 +70,181 @@ composition, FLARE being one such model. The resulting low-activation feasible
 space is the starting point for the property evaluation and graded-path design that
 follow.
 
-\subsection{High-Throughput Property Calculations}
+\subsection{Property Calculations}
 \label{sec:feasible-space-props}
 
-Following activation screening, the surviving compositions were
-characterized by high-throughput calculations of the properties on which the
-design depends. Because direct experimental characterization is impractical
-for the number of candidates considered in this work, physically motivated
-analytical models were employed as first-order estimates, with the
-Maresca-Curtin model providing yield strength and the Pugh ratio providing
-intrinsic ductility. CALPHAD calculations then supplied the phase stability,
-melting behavior, and thermophysical properties on which the property
-screens and the classification of Section~\ref{sec:results} are built.
+Following activation screening, the surviving compositions were characterized by
+high-throughput calculations of the properties on which the design depends. Because
+direct experimental characterization is impractical for the number of candidates
+considered, physically motivated models were used as first-order estimates: the
+Maresca--Curtin model for yield strength, the Pugh ratio for intrinsic ductility,
+and CALPHAD for phase stability, melting behavior, and thermophysical properties.
 
-
-\subsubsection{Strength and Ductility Descriptors}
-The feasible compositions were evaluated with the Maresca-Curtin (MC)
-model as a first approximation of alloy yield strength
-\cite{maresca2020mechanistic}, following the methodology previously applied
-to the screening of refractory multi-principal-element alloys
-\cite{vela2023data}. The model is a physics-based framework for
-body-centered cubic random solid solutions that relates strength to the
-energetics of thermally activated dislocation glide, with the
+Yield strength was estimated with the Maresca--Curtin (MC) model for
+body-centered cubic random solid solutions~\cite{maresca2020mechanistic},
+following the methodology previously applied to the screening of refractory
+multi-principal-element alloys~\cite{vela2023data}. The model relates strength to
+the energetics of thermally activated dislocation glide, with the
 temperature-dependent yield strength given by
 \begin{equation}
-\begin{aligned}
 \tau_y(T,\dot{\varepsilon})
-&= \tau_{y0}
+= \tau_{y0}
 \exp\!\left[
 -\frac{1}{0.55}
 \left(
 \frac{kT}{\Delta E_b}
 \ln\!\left(\frac{\dot{\varepsilon}_0}{\dot{\varepsilon}}\right)
 \right)^{0.91}
-\right]
-\end{aligned}
+\right],
 \label{eq:yield_stress}
 \end{equation}
 where $\tau_{y0}$ is the athermal yield strength, $\Delta E_b$ is the
 activation barrier for dislocation glide, $T$ is the absolute temperature,
 $\dot{\varepsilon}$ is the applied strain rate, $\dot{\varepsilon}_0$ is the
 reference strain rate, and $k$ is Boltzmann's constant, with the tensile
-yield strength obtained through the appropriate Taylor-factor conversion.
+yield strength obtained through the appropriate Taylor-factor conversion. The
+physical inputs, including atomic volumes, elastic constants ($C_{11}$, $C_{12}$,
+and $C_{44}$), shear moduli, and Poisson ratios, were assembled from literature
+data and combined by the rule of mixtures. Yield strengths were evaluated at 600
+and $650^{\circ}\mathrm{C}$, the service temperatures considered for the
+plasma-facing and structural sides of the wall, at a strain rate of
+$10^{-3}\,\mathrm{s}^{-1}$, and are used as design criteria in
+Section~\ref{sec:joinable}.
 
-The physical inputs required by the model, including atomic volumes, elastic
-constants ($C_{11}$, $C_{12}$, and $C_{44}$), shear moduli, and Poisson
-ratios, were assembled from literature data and combined using the rule of
-mixtures to approximate the effective properties of each composition. Yield
-strengths were evaluated at 25, 600, and $650^{\circ}\mathrm{C}$ at a strain
-rate of $10^{-3}\,\mathrm{s}^{-1}$ and recorded as mechanical-property
-descriptors.
-
-Intrinsic ductility was screened using the Pugh ratio \(B/G\), the ratio of
-bulk to shear modulus, in the modern convention in which larger values
-indicate greater ductility~\cite{pugh1954,singh2023ductility}; this is the
-inverse of Pugh's original \(G/B\) formulation. For high-throughput
-evaluation, the elemental Poisson ratios \(\nu_i\) were combined by the rule
-of mixtures to give \(\bar{\nu}=\sum_i x_i \nu_i\), where $x_i$ is the molar fraction of element $i$, and the alloy Pugh ratio
-was estimated through the isotropic relations \(E=3B(1-2\nu)\) and
-\(G=E/2(1+\nu)\), under which the bulk modulus cancels and the descriptor
-reduces to
+Intrinsic ductility was assessed with the Pugh ratio \(B/G\), the ratio of bulk to
+shear modulus, in the modern convention in which larger values indicate greater
+ductility~\cite{pugh1954,singh2023ductility}. The elemental Poisson ratios
+\(\nu_i\) were combined by the rule of mixtures, \(\bar{\nu}=\sum_i x_i \nu_i\),
+where $x_i$ is the atomic fraction of element $i$, and through the isotropic
+relations \(E=3B(1-2\nu)\) and \(G=E/2(1+\nu)\) the descriptor reduces to
 \begin{equation}
-\frac{B}{G}=\frac{2\,(1+\bar{\nu})}{3\,(1-2\bar{\nu})},
+\frac{B}{G}=\frac{2\,(1+\bar{\nu})}{3\,(1-2\bar{\nu})}.
 \label{eq:pugh}
 \end{equation}
-a function of the composition-averaged Poisson ratio alone. A composition was
-classified as intrinsically ductile when \(B/G \ge 2.6\), a stricter cutoff than
-the conventional \(B/G > 1.75\) criterion~\cite{singh2023ductility}. As a
-rule-of-mixtures prior, this descriptor serves as a screening-level estimate;
-first-principles or experimental validation of the selected compositions is
-deferred to future work.
+A composition is considered intrinsically ductile when \(B/G \ge 2.6\), a stricter
+cutoff than the conventional \(B/G > 1.75\) criterion~\cite{singh2023ductility}.
+As a rule-of-mixtures prior, this descriptor serves as a screening-level estimate.
 
+Phase stability, melting behavior, and thermophysical properties were obtained with
+the CALPHAD (CALculation of PHAse Diagrams) method, in which the Gibbs free energy
+of every candidate phase is described by parametric models assessed from
+experimental and first-principles data and extrapolated to multicomponent
+alloys~\cite{li2023calphad,conway2022thermodynamic}. Calculations were performed
+with Thermo-Calc's TC-Python API and the TCHEA6 database, assessed for
+high-entropy and refractory multi-principal-element systems. Equilibrium phase
+fractions, including the BCC solid solution and competing intermetallic phases such
+as sigma, Laves, mu, and chi, were computed at 500, 600, and
+$650^{\circ}\mathrm{C}$. The solidus temperature \(T_s\) was obtained with the
+Liquidus and Solidus Temperature property model, and the thermal conductivity at
+$25^{\circ}\mathrm{C}$ and the linear coefficient of thermal expansion (CTE)
+\(\alpha\) at 600 and $650^{\circ}\mathrm{C}$ with the Equilibrium with Freeze-in
+temperature property model.
 
-\subsubsection{CALPHAD Thermodynamic Calculations}
-
-The feasible alloy compositions were evaluated using the CALPHAD
-(CALculation of PHAse Diagrams) method to characterize their thermodynamic
-stability, phase constitution, melting behavior, and thermophysical
-properties. In the CALPHAD approach, the Gibbs free energy of every candidate
-phase is described by parametric models whose coefficients are assessed from
-experimental and first-principles data for the constituent binary and ternary
-subsystems and extrapolated to higher-order systems, allowing equilibria in
-multicomponent alloys to be computed where direct experimental phase data do
-not exist. The method is widely employed for alloy design and phase-stability
-prediction in complex concentrated and refractory alloy
-systems~\cite{li2023calphad,conway2022thermodynamic}. Thermodynamic
-calculations were performed with high-throughput python scripts written with Thermo-Calc's TC-Python API using the TCHEA6 thermodynamic
-database, assessed specifically for high-entropy and refractory
-multi-principal-element systems. For each composition, the equilibrium state
-was obtained by global minimization of the total Gibbs free energy over the
-active elemental components.
-
-Equilibrium phase calculations were performed at 25, 500, 600, 650, 700, 800,
-and 900~$^{\circ}\mathrm{C}$, together with an elevated temperature of
-2000~$^{\circ}\mathrm{C}$, determining at each temperature the stable phases
-and their mole fractions, including the BCC solid solution and competing
-intermetallic phases such as sigma, Laves, mu, and chi. The melting behavior
-of each alloy was evaluated using the Thermo-Calc Liquidus and Solidus
-Temperature property model, and thermophysical properties, including density, heat
-capacity, thermal conductivity and resistivity, thermal diffusivity,
-electrical conductivity and resistivity, and thermal expansion, were obtained
-with the Equilibrium with Freeze-in temperature property model at the liquidus
-and solidus temperatures and at fixed temperatures spanning
-25-900~$^{\circ}\mathrm{C}$. The resulting phase-fraction, melting, and
-thermophysical data provide the temperature-dependent inputs for the property
-screens that follow.
-% screens and the Edge Localized Mode (ELM) melting-margin calculations that follow.
-
-%\subsection{Joinable Composition Regions}
-%\label{sec:joinable}
-%A graded transition requires a connected region of feasible composition space. To identify such regions, the compositions surviving the property filters were organized into a simplex-lattice graph, in which two compositions are neighbors when they differ by a single grid step, one element decreased and another increased by one increment~\cite{nimplex}. Graph representations of the design space have likewise been used within this framework for the design of compositionally graded structures~\cite{multiterminalCGA2024}. Constraints are imposed on the graph representation of the alloy design space by removing all edges connecting to nodes that do not pass. The remaining edges after this filtering procedure represent compositions capable of being joined in a graded alloy without violating design constraints. Because the filters remove compositions unevenly, this graph is generally not fully connected and separates into multiple connected components, regions within which any two compositions are joined by a continuous chain of single-step feasible neighbors. These components are the subgraphs, and the largest is carried forward as the design region, since it offers the widest contiguous space for a graded transition. For other more complex CGA design scenarios the choice of subgraph can prove to be less trivial, requiring a closer analysis of the property trends and characteristics of each subgraph \cite{obrist2026graph}.
-
-%Within this largest subgraph, the graded alloy is designed as a doubly-monotonic shortest path between two terminal compositions. Terminals are restricted to deployable multi-component alloys, requiring at least three constituents with no single element above \(90\)~at.\%, so that the design is anchored by realistic alloys rather than the pure-element property extrema. Within these pools, the plasma-facing terminal is the maximum-solidus composition among the high-solidus candidates and the structural terminal the maximum-Pugh composition among the ductile candidates. Monotonicity of the transition is enforced as a hard constraint on the graph itself. Each undirected lattice edge is expanded into its two directed transitions, and a directed edge \(u\!\to\!v\) is retained only if it does not increase the solidus and does not decrease the Pugh ratio, \(T_s(v)\le T_s(u)\) and \(B/G(v)\ge B/G(u)\), with all other transitions deleted. Dijkstra's algorithm with unit edge weights then returns the exact shortest path on the pruned directed graph. Because monotonicity is imposed by edge deletion rather than by a penalty term, the formulation contains no tuning parameters, in contrast to cost-function approaches in which monotonicity is promoted through a weight that must be selected~\cite{kirk2021monotonic}. A penalized fallback exists for terminal pairs disconnected by the strict pruning but was not required in this work. The returned path is verified independently of its construction by per-step assertions and by a loss-of-invariance metric, defined for each property as the summed magnitude of all counter-trend increments along the path, which is zero for a perfectly monotonic profile. Because each edge connects compositions separated by a single grid step and the path is confined to the property-acceptable subgraph, every intermediate composition of the graded transition remains feasible by construction.
-
-
-\subsection{Joinable Composition Regions}
+\subsection{Graded-Path Design}
 \label{sec:joinable}
 
-A graded transition requires a connected region of feasible composition
-space, and to identify such regions the compositions surviving the property
-filters of Section~\ref{subsec:subgraphs} were organized into a
-simplex-lattice graph, in which two
-compositions are neighbors when they differ by a single grid step, one
-element decreased and another increased by one increment~\cite{nimplex}.
-Graph representations of the design space have likewise been used within
-this framework for the design of compositionally graded
-structures~\cite{multiterminalCGA2024}. Constraints are imposed on the graph
-representation of the alloy design space by removing the nodes that do not
-satisfy the property filters, together with their associated edges. The remaining edges after this filtering procedure
-represent allowable transitions between neighboring feasible compositions
-within the design constraints. Because the filters remove compositions
-unevenly, the resulting graph is generally disconnected and separates into
-multiple connected components, or subgraphs. The largest is carried forward
-as the design region because it offers the widest contiguous composition
-space for a graded transition. For other more complex CGA design scenarios the
-choice of subgraph can prove to be less trivial, requiring a closer analysis
-of the property trends and characteristics of each
-subgraph~\cite{obrist2026graph}.
+The activation-feasible compositions were first screened for single-phase BCC
+stability and heat removal, retaining a composition only if
+\begin{equation}
+f_{\mathrm{BCC}}(T) \ge 0.98 \quad (T = 500,\ 600,\ 650\ ^{\circ}\mathrm{C}),
+\qquad \kappa_{25\,^{\circ}\mathrm{C}} > 16~\mathrm{W\,m^{-1}\,K^{-1}},
+\label{eq:filters}
+\end{equation}
+where \(f_{\mathrm{BCC}}\) is the BCC phase fraction and \(\kappa\) the thermal
+conductivity. The surviving compositions were organized into a simplex-lattice
+graph~\cite{nimplex}, in which two compositions \(u\) and \(v\) are neighbors when
+they differ by a single grid step,
+\(\mathbf{x}_v-\mathbf{x}_u = 0.05\,(\mathbf{e}_b-\mathbf{e}_a)\), one element
+decreased and another increased by one increment. Graph representations of the
+design space have likewise been used for the design of compositionally graded
+structures~\cite{multiterminalCGA2024}. Because the screens remove compositions
+unevenly, the graph separates into connected subgraphs, and the largest is carried
+forward as the design region since it offers the widest contiguous space for a
+graded transition~\cite{obrist2026graph}.
 
-Within this largest subgraph, the graded alloy is designed as a
-doubly-monotonic shortest path between two terminal compositions. Terminals
-are restricted to multicomponent alloys containing at least three
-constituents, with no single element above \(90\)~at.\%, reflecting the
-multicomponent design intent of the search and excluding degenerate
-pure-element property extrema, with the full rationale given in
-Section~\ref{subsec:path}. Within these pools, the plasma-facing terminal is selected as the
-maximum-solidus composition among the high-solidus candidates, while the
-structural terminal is selected as the maximum-Pugh-ratio composition among
-the ductile candidates. Monotonicity of the transition is enforced as a hard constraint
-on the graph itself. Each undirected lattice edge is expanded into two directed
-transitions, and a transition between neighboring compositions is retained
-only if it neither increases the solidus temperature nor decreases the Pugh
-ratio. All other transitions are deleted. Dijkstra's algorithm with unit edge weights then returns the exact
-shortest path on the pruned directed graph.
-This graph formulation carries practical advantages over the
-sampling-based planning in which pathwise property monotonicity was
-introduced~\cite{kirk2021monotonic}. Every node property is computed once
-and stored with the graph, so the search queries no property model on the
-fly and needs no weighting parameter, returning a monotonic path
-exactly rather than approximately.
-A penalized fallback that minimizes monotonicity violations is retained for cases in which no strictly monotonic path exists, although it was not required here. The returned path is independently verified by per-step assertions and a loss-of-invariance metric, for which zero indicates a perfectly monotonic profile.
+Each composition of the design region is classified by the property the two sides
+of the first wall require. A composition is a plasma-facing candidate,
+Material~A, or a structural candidate, Material~B, when
+\begin{equation}
+\text{A:}\ \ T_s > 2200~^{\circ}\mathrm{C}\ \text{and}\ \sigma_y^{600} \ge 300~\mathrm{MPa},
+\qquad
+\text{B:}\ \ B/G \ge 2.6\ \text{and}\ \sigma_y^{650} \ge 250~\mathrm{MPa},
+\label{eq:classes}
+\end{equation}
+where \(\sigma_y^{T}\) is the yield strength at \(T\)~\(^{\circ}\)C. The strength
+limits are set at the level of the reference structural steel
+EUROFER97~\cite{lindau2005eurofer}, so that every candidate is at least as strong as
+the steel it would replace at the service temperatures.
+Compositions satisfying both definitions form Material~AB, and those satisfying
+neither are classified as Intermediate. The two ends of the gradient are chosen by
+the function of each side of the wall, as in previous gradient design
+studies~\cite{kirk2021monotonic}: the plasma-facing (PFM) end is the
+highest-solidus composition of Material~A or AB, and the structural end the
+highest-Pugh-ratio composition of Material~B or AB,
+\begin{equation}
+v_{\mathrm{PFM}} = \arg\max_{v \in A \cup AB} T_s(v), \qquad
+v_{\mathrm{str}} = \arg\max_{v \in B \cup AB} (B/G)(v).
+\label{eq:ends}
+\end{equation}
+
+A graded path \(P=(v_0,v_1,\dots,v_L)\), with \(v_0=v_{\mathrm{PFM}}\) and
+\(v_L=v_{\mathrm{str}}\), is a sequence of neighboring compositions, each step
+corresponding to one deposited layer. Every layer must be a design material that is
+at least as strong as EUROFER97 at both service temperatures and a multicomponent
+alloy, so the admissible compositions are
+\begin{equation}
+\mathcal{V} = \{\, v \in A \cup B \cup AB :\ \sigma_y^{600}(v) \ge 300~\mathrm{MPa},\
+\sigma_y^{650}(v) \ge 250~\mathrm{MPa},\ N_{\mathrm{el}}(v) \ge 3 \,\},
+\label{eq:admissible}
+\end{equation}
+where \(N_{\mathrm{el}}\) is the number of constituent elements. Two monotonicity
+constraints are imposed on every step \(u \to v\),
+\begin{equation}
+\alpha_T(v) \ge \alpha_T(u) \quad (T = 600,\ 650\ ^{\circ}\mathrm{C}),
+\qquad T_s(v) \le T_s(u).
+\label{eq:monotone}
+\end{equation}
+A monotonic CTE keeps the thermal-expansion mismatch at every interface in the same
+direction, from the low-expansion plasma-facing alloy to the higher-expansion
+structural alloy, so that no interlayer reverses the strain gradient across the
+wall~\cite{kirk2021monotonic}. A monotonic solidus follows the temperature profile
+of the wall, which falls from the plasma-facing surface toward the coolant, so that
+no layer has a lower melting point than a layer behind it, in the same way that a
+monotonic liquidus prevents remelting of previously deposited layers during graded
+deposition~\cite{glerum2026ss316tzm}. These constraints are imposed on the graph
+itself: each undirected edge is expanded into its two directed steps, and a step is
+kept only if both compositions belong to \(\mathcal{V}\) and it satisfies
+\Cref{eq:monotone}.
+
+The path cost follows Kirk et al.~\cite{kirk2021monotonic}, a monotonicity
+penalty plus a small path-length weight,
+\begin{equation}
+c(P) = \mathrm{LOI}(P) + w\,l(P), \qquad w \ll 1,
+\label{eq:cost}
+\end{equation}
+where the loss of invariance, LOI, is the total change of the constrained
+properties against their required direction and \(l\) is the path length in
+composition space,
+\begin{equation}
+\mathrm{LOI}(P)=\sum_{k=1}^{L}\Big[\sum_{T}\max\!\big(\alpha_T(v_{k-1})-\alpha_T(v_k),0\big)
++\max\!\big(T_s(v_k)-T_s(v_{k-1}),0\big)\Big],
+\qquad
+l(P)=\sum_{k=1}^{L}\lVert \mathbf{x}_{v_k}-\mathbf{x}_{v_{k-1}}\rVert_2 .
+\label{eq:loi}
+\end{equation}
+Because the monotonicity constraints are imposed as hard rules, \(\mathrm{LOI}=0\) on
+every admissible path, and since every step is a single 5~at.\% exchange,
+\(l = 0.05\sqrt{2}\,L\). The cost therefore reduces to the number of steps, and the
+design path is the shortest monotonic path,
+\begin{equation}
+P^{*} = \arg\min_{P}\, L(P),
+\label{eq:shortest}
+\end{equation}
+which is found exactly by Dijkstra's algorithm~\cite{dijkstra1959note} with unit
+step weights on the directed graph of admissible monotonic steps. Because every
+composition property is computed once and stored with the graph, the search
+returns the optimal path exactly rather than approximately, in contrast to the
+sampling-based planners used previously~\cite{kirk2021monotonic,kirk2018gradient}.
+Several paths can share the minimum length; they are equally optimal under this
+cost, and the algorithm returns one of them deterministically. The returned path is
+verified step by step against \Cref{eq:admissible,eq:monotone}.
