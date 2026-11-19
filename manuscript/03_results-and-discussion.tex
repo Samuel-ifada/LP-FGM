@@ -27,36 +27,33 @@ activation responses under the conditions of Table~\ref{tab:ind_variables}.
 
 The LP construction returned exactly the compositions found by brute-force FLARE
 evaluation of the full grid, with every response agreeing to numerical precision,
-at a fraction of the cost (Table~\ref{tab:benchmark}). Brute force evaluates all
+at a fraction of the cost (Fig.~\ref{fig:benchmark}). Brute force evaluates all
 \(30{,}045{,}015\) grid compositions, whereas the LP approach evaluates only those
 inside the polytope, reducing the wall-clock time from
 \textcolor{red}{[\,\(t_{\mathrm{BF}}\)\,]} to \textcolor{red}{[\,\(t_{\mathrm{LP}}\)\,]}
 and the peak memory from \textcolor{red}{[\,\(m_{\mathrm{BF}}\)\,]} to
-\textcolor{red}{[\,\(m_{\mathrm{LP}}\)\,]}. The brute-force cost grows with the number
-of grid points, which increases combinatorially with the number of elements and the
-grid resolution, while the LP cost grows with the size of the feasible set, so the
-advantage widens as the design space is refined.
+\textcolor{red}{[\,\(m_{\mathrm{LP}}\)\,]} on \textcolor{red}{[\,\(n\)\,]} CPU cores.
+The brute-force cost grows with the number of grid points, which increases
+combinatorially with the number of elements and the grid resolution, while the LP
+cost grows with the size of the feasible set, so the advantage widens as the design
+space is refined.
 
-\begin{table}[H]
-\centering
-\caption{Cost of identifying the activation-feasible compositions by brute-force
-evaluation and by the LP construction, for both references. Hardware and software
-are given in Section~\ref{sec:feasible-space}.}
-\label{tab:benchmark}
-\begin{tabularx}{\columnwidth}{lXX}
-\toprule
- & Brute force & LP \\
-\midrule
-Compositions evaluated       & \(30{,}045{,}015\) & \textcolor{red}{[\,\,]} \\
-Feasible, \(10\times\)W        & \(210\)            & \(210\) \\
-Feasible, \(10\times\)EUROFER97 & \(61{,}297\)      & \(61{,}297\) \\
-Wall-clock time              & \textcolor{red}{[\,\,]} & \textcolor{red}{[\,\,]} \\
-CPU cores used               & \textcolor{red}{[\,\,]} & \textcolor{red}{[\,\,]} \\
-Peak memory                  & \textcolor{red}{[\,\,]} & \textcolor{red}{[\,\,]} \\
-Speed-up                     & \(1\times\)        & \textcolor{red}{[\,\,]} \\
-\bottomrule
-\end{tabularx}
-\end{table}
+\begin{figure}[H]
+  \centering
+  % TODO: replace the box with figures/fig_lp_benchmark.pdf once the benchmark is run
+  \fbox{\parbox[c][0.55\linewidth][c]{0.95\linewidth}{\centering\textcolor{red}{%
+  [LP vs.\ brute-force benchmark figure]\\[4pt]
+  (a) wall-clock time and (b) peak memory against the number of grid compositions,\\
+  for grid steps of \(10\), \(5\) and \(2.5\)~at.\%, both references}}}
+  % \includegraphics[width=\linewidth]{figures/fig_lp_benchmark.pdf}
+  \caption{Cost of identifying the activation-feasible compositions by brute-force
+  evaluation (all grid compositions) and by the LP construction (compositions inside
+  the polytope only): (a) wall-clock time and (b) peak memory as functions of the
+  number of grid compositions, for the \(10\times\)W and \(10\times\)EUROFER97
+  references. Both methods return identical feasible sets. Hardware and software are
+  given in Section~\ref{sec:feasible-space}.}
+  \label{fig:benchmark}
+\end{figure}
 
 
 \subsection{Phase Stability, Thermal Conductivity, and the Design Region}
