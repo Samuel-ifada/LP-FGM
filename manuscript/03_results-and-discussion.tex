@@ -13,70 +13,82 @@ compositions as points and the projected vertex hull outlined.}
 
 \subsection{Activation-Feasible Space}
 \label{subsec:feasible}
-Sampling of an eleven-element Cr-Fe-Hf-Mo-Nb-Re-Ta-Ti-V-W-Zr alloy
-space on a \(5\)~at.\% grid yields \(30{,}045{,}015\) candidate
-compositions, and evaluating every candidate individually at this scale
-is costly. Since the activation responses are linear
-in composition, the feasible region is instead constructed directly as a
-polytope from the constraints, and the grid compositions lying inside it are
-enumerated, producing \(210\) feasible compositions under the
-\(10\times\)W reference and \(61{,}297\) under \(10\times\)EUROFER97.
-The two feasible regions are shown projected onto the composition simplex in
-Fig.~\ref{fig:polytope}. The two orders of magnitude
-difference between the two sets reflects the baseline responses of the
-references, since ten times a lower baseline is the tighter bound.
-Although all eleven elements were free to vary, only Ti, V, Zr, Cr, Fe, Re, and W
-occur in the feasible compositions of either screen. The remaining four elements,
-Ta, Nb, Mo, and Hf, are excluded entirely by the activation criteria rather than by
-any prior restriction. By construction, every surviving composition remains within
-a factor of ten of its reference material for all activation responses under the
-irradiation conditions of Table~\ref{tab:ind_variables}, and this bound is retained
-through the subsequent property screens and along the graded path.
+The \(5\)~at.\% grid of the eleven-element system contains \(30{,}045{,}015\)
+compositions. The LP construction identifies \(210\) of them as feasible under the
+\(10\times\)W reference and \(61{,}297\) under the \(10\times\)EUROFER97 reference
+(Fig.~\ref{fig:polytope}), the two sets corresponding to the plasma-facing and
+structural sides of the wall. The difference of more than two orders of magnitude
+reflects the lower activation of pure W, for which ten times the baseline is the
+tighter bound. Although all eleven elements were free to vary, Ta, Nb, Mo, and Hf do
+not occur in either set: they are excluded by activation alone, before any property
+is considered. Every composition retained here, and therefore every layer of the
+final gradient, stays within a factor of ten of its reference material for all
+activation responses under the conditions of Table~\ref{tab:ind_variables}.
 
-The constraint-first approach was verified against a brute-force FLARE
-evaluation of the full grid, which returned the same feasible compositions
-under each reference, with every response agreeing to numerical precision.
-The two approaches reach this result with different effort. The polytope
-enumeration, which touches only the feasible set, completed in
-\textcolor{red}{\texttt{Insert Runtime}}, while brute force evaluates every
-grid candidate explicitly and becomes rapidly more expensive as the grid
-grows. The deviation factor remains a tunable setting, and stricter or looser
-values than the tenfold tolerance used here would contract or expand the
-space accordingly, since the constraint bounds scale directly with it.
+The LP construction returned exactly the compositions found by brute-force FLARE
+evaluation of the full grid, with every response agreeing to numerical precision,
+at a fraction of the cost (Table~\ref{tab:benchmark}). Brute force evaluates all
+\(30{,}045{,}015\) grid compositions, whereas the LP approach evaluates only those
+inside the polytope, reducing the wall-clock time from
+\textcolor{red}{[\,\(t_{\mathrm{BF}}\)\,]} to \textcolor{red}{[\,\(t_{\mathrm{LP}}\)\,]}
+and the peak memory from \textcolor{red}{[\,\(m_{\mathrm{BF}}\)\,]} to
+\textcolor{red}{[\,\(m_{\mathrm{LP}}\)\,]}. The brute-force cost grows with the number
+of grid points, which increases combinatorially with the number of elements and the
+grid resolution, while the LP cost grows with the size of the feasible set, so the
+advantage widens as the design space is refined.
+
+\begin{table}[H]
+\centering
+\caption{Cost of identifying the activation-feasible compositions by brute-force
+evaluation and by the LP construction, for both references. Hardware and software
+are given in Section~\ref{sec:feasible-space}.}
+\label{tab:benchmark}
+\begin{tabularx}{\columnwidth}{lXX}
+\toprule
+ & Brute force & LP \\
+\midrule
+Compositions evaluated       & \(30{,}045{,}015\) & \textcolor{red}{[\,\,]} \\
+Feasible, \(10\times\)W        & \(210\)            & \(210\) \\
+Feasible, \(10\times\)EUROFER97 & \(61{,}297\)      & \(61{,}297\) \\
+Wall-clock time              & \textcolor{red}{[\,\,]} & \textcolor{red}{[\,\,]} \\
+CPU cores used               & \textcolor{red}{[\,\,]} & \textcolor{red}{[\,\,]} \\
+Peak memory                  & \textcolor{red}{[\,\,]} & \textcolor{red}{[\,\,]} \\
+Speed-up                     & \(1\times\)        & \textcolor{red}{[\,\,]} \\
+\bottomrule
+\end{tabularx}
+\end{table}
 
 
 \subsection{Phase Stability, Thermal Conductivity, and the Design Region}
 \label{subsec:subgraphs}
 
-The activation-feasible compositions of the two screens were merged into a single
-set, and the \(204\) compositions feasible under both references were counted once,
-leaving \(61{,}303\) unique compositions. Applying the single-phase BCC and
-thermal-conductivity criteria of \Cref{eq:filters} together leaves \(700\)
-compositions, \(1.1\%\) of the candidates, concentrated in the \ch{W-V-Cr-Fe}
-region of the simplex. Of the two criteria, phase stability is by far the more
-restrictive: \(50{,}365\) compositions exceed the conductivity limit, but only
-\(706\) remain single-phase BCC at all three temperatures.
+Merging the two activation-feasible sets, in which \(204\) compositions are feasible
+under both references, gives \(61{,}303\) unique compositions. Of these, \(700\)
+(\(1.1\%\)) satisfy the phase-stability and conductivity criteria of
+\Cref{eq:filters}. Phase stability is the decisive filter: \(50{,}365\) compositions
+conduct heat adequately, but only \(706\) remain single-phase BCC at all three
+temperatures. The reduced-activation space is therefore dominated by compositions
+that would form intermetallics in service, and a gradient designed without a phase
+constraint would almost certainly pass through them.
 
-Connecting these \(700\) compositions on the simplex lattice gives three
-disconnected subgraphs (Fig.~\ref{fig:clusters}). Subgraph~1 contains \(686\)
-compositions, about \(98\%\) of the survivors, and forms a connected region
-extending from the tungsten-rich corner through the vanadium- and titanium-rich
-region toward chromium. Subgraphs~2 and~3 are small isolated islands of eight and
-six compositions, the first near the Fe corner and the second in the interior of the
-simplex, feasible in every screened property yet unreachable from Subgraph~1.
-A path within a subgraph moves between compositions in small steps without leaving
-the feasible set, whereas crossing between subgraphs would require passing through
-infeasible compositions. Subgraph~1, offering the largest contiguous space for a
-graded transition, is therefore carried forward as the design region.
+On the composition graph, the \(700\) compositions form three disconnected subgraphs
+(Fig.~\ref{fig:clusters}). Subgraph~1 holds \(686\) compositions, \(98\%\) of the
+total, extending from the tungsten-rich corner through the vanadium- and
+titanium-rich region toward chromium. Subgraphs~2 and~3 are islands of eight and six
+compositions, near the Fe corner and in the interior of the simplex, that satisfy
+every screen yet cannot be reached from Subgraph~1 without passing through a
+composition that fails one. Subgraph~1 is the only region in which a gradient can be
+built from feasible layers alone, and it is the design region.
 
 \begin{figure}[H]
   \centering
   \includegraphics[width=0.9\linewidth]{figures/fig1_subgraphs.pdf}
   \caption{Connected subgraphs of the \(700\) compositions that pass the
   activation, single-phase BCC, and thermal-conductivity screens, projected onto
-  the eleven-element composition space, with each element at a vertex. Subgraph~1
-  (blue, \(686\) compositions) is the design region; Subgraphs~2 (green) and~3
-  (red) are isolated islands of eight and six compositions.}
+  the eleven-element composition space, with each element at a vertex. Circled
+  numbers identify the subgraphs: Subgraph~1 (blue, \(686\) compositions) is the
+  design region, and Subgraphs~2 (green) and~3 (red) are isolated islands of eight
+  and six compositions.}
   \label{fig:clusters}
 \end{figure}
 
@@ -84,16 +96,17 @@ graded transition, is therefore carried forward as the design region.
 \subsection{Plasma-Facing and Structural Materials}
 \label{subsec:classification}
 
-The \(686\) compositions of the design region were classified with
-\Cref{eq:classes}. Of these, \(139\) qualify as Material~A, \(169\) as
-Material~B, and \(18\) as Material~AB, while \(360\) meet neither definition and are
-Intermediate (Fig.~\ref{fig:categories}). Material~A clusters in the tungsten-rich
-corner of the design region and Material~B in the vanadium-rich region, with the
-small Material~AB set lying between them, where high-temperature capability and
-intrinsic ductility are met together. The large Intermediate fraction reflects the
-strength limits: many compositions with a high solidus or a high Pugh ratio fall
-below the EUROFER97-level yield strength and are not considered as design
-materials.
+Classifying the design region by the two sides of the wall (\Cref{eq:classes})
+gives \(139\) plasma-facing compositions (Material~A), \(169\) structural
+compositions (Material~B), and \(18\) that qualify for both (Material~AB); the
+remaining \(360\) are Intermediate (Fig.~\ref{fig:categories}). The two materials
+occupy opposite ends of the design region, Material~A the tungsten-rich corner and
+Material~B the vanadium-rich region, with Material~AB between them, where high
+melting point and ductility coexist. Of the Intermediate compositions, \(193\)
+satisfy the melting or ductility criterion but fall below the EUROFER97-level
+strength, and \(184\) of these are ductile, vanadium-rich compositions that are too
+weak at \(650^{\circ}\)C. The strength requirement therefore limits chiefly the
+structural side of the wall.
 
 \begin{figure}[H]
   \centering
@@ -105,44 +118,37 @@ materials.
   \label{fig:categories}
 \end{figure}
 
-The terminal alloys were selected with \Cref{eq:ends} from the \(157\)
-plasma-facing (A or AB) and \(187\) structural (B or AB) candidates. The
-plasma-facing terminal is \ch{W90V5Re5}, with the highest solidus of the candidates
-(\(3449\)~K) and a yield strength of \(310\)~MPa at \(600^{\circ}\)C, and the
-structural terminal is \ch{W15V75Ti10}, with the highest Pugh ratio (\(3.03\)) and a
-yield strength of \(285\)~MPa at \(650^{\circ}\)C. The linear CTE of the two
-terminals at \(600^{\circ}\)C is \(5.03\) and \(9.28\times10^{-6}\)~K\(^{-1}\), so
-the gradient path must carry the wall through an expansion change of about
-\(4.2\times10^{-6}\)~K\(^{-1}\). Both terminals are multicomponent alloys, which
-indicates that the material classes and strength limits alone are sufficient to
-move the terminals away from the pure elements.
-
+The terminal alloys selected with \Cref{eq:ends} from the \(157\) plasma-facing (A
+or AB) and \(187\) structural (B or AB) candidates are \ch{W90V5Re5}, with the
+highest solidus (\(3449\)~K) and a yield strength of \(310\)~MPa at
+\(600^{\circ}\)C, and \ch{W15V75Ti10}, with the highest Pugh ratio (\(3.03\)) and a
+yield strength of \(285\)~MPa at \(650^{\circ}\)C. Neither terminal is a pure
+element: the class definitions alone move both ends of the wall into
+multicomponent alloys. Their linear CTE at \(600^{\circ}\)C, \(5.03\) and
+\(9.28\times10^{-6}\)~K\(^{-1}\), sets the expansion change of
+\(4.2\times10^{-6}\)~K\(^{-1}\) that the gradient must accommodate.
 
 
 \subsection{Gradient Path with Monotonic CTE and Solidus}
 \label{subsec:path}
 
-Of the \(686\) compositions of the design region, \(293\) are admissible path layers
-under \Cref{eq:admissible}, and of the \(7{,}348\) directed single-exchange steps
-of the design region, \(2{,}714\) join two admissible compositions and satisfy the
-monotonicity constraints of \Cref{eq:monotone}. Dijkstra's algorithm on this
-directed graph returned a path of \(16\) steps, \(17\) alloys in total, from
-\ch{W90V5Re5} to \ch{W15V75Ti10} (Fig.~\ref{fig:path-map} and
-Table~\ref{tab:path}). Every step was verified to be a single \(5\)~at.\%
-exchange between admissible compositions, with the CTE non-decreasing at both
-temperatures and the solidus non-increasing, so that \(\mathrm{LOM}=0\) and the
-path cost of \Cref{eq:cost} reduces to its length. Sixteen steps is also the
-shortest path possible between these two terminals: the path must remove
-\(75\)~at.\% W and \(5\)~at.\% Re, and each step removes \(5\)~at.\% of one
-element, so at least \(16\) steps are needed even without monotonicity. This
-indicates that both monotonicity constraints are met at no cost in path length.
-Several paths share this minimum length; they are equally optimal under the cost
-function and satisfy the same constraints, and Dijkstra's algorithm returns one of
+A gradient that joins the two materials while satisfying every requirement exists,
+and it is as short as any gradient between these terminals can be. Of the \(686\)
+compositions of the design region, \(293\) are admissible layers
+(\Cref{eq:admissible}), and of the \(7{,}348\) directed single-exchange steps,
+\(2{,}714\) join two admissible layers and satisfy \Cref{eq:monotone}. Dijkstra's
+algorithm on this graph returned a path of \(16\) steps (\(17\) alloys) from
+\ch{W90V5Re5} to \ch{W15V75Ti10} (Fig.~\ref{fig:path-map}, Table~\ref{tab:path}),
+verified step by step, with \(\mathrm{LOM}=0\). No path between these terminals can
+be shorter, with or without monotonicity: \(75\)~at.\% W and \(5\)~at.\% Re must be
+removed, \(5\)~at.\% per step. Requiring the CTE and the solidus to be monotonic at
+the same time therefore adds no layers to the wall. Several paths share this
+minimum length; they are equally optimal, and Dijkstra's algorithm returns one of
 them deterministically.
 
-\begin{figure}[H]
+\begin{figure*}[!t]
   \centering
-  \includegraphics[width=0.85\linewidth]{figures/fig3_design_path_map.pdf}
+  \includegraphics[width=0.72\textwidth]{figures/fig3_design_path_map.pdf}
   \caption{The design path in W--V composition space, with the remaining path
   elements (Ti and Re) as the balance, so that the origin corresponds to pure
   Ti\(+\)Re. Each cell of the \(5\)~at.\% grid is coloured by its material class if
@@ -151,19 +157,18 @@ them deterministically.
   plasma-facing terminal \ch{W90V5Re5} (yellow star) to the structural terminal
   \ch{W15V75Ti10} (cyan star).}
   \label{fig:path-map}
-\end{figure}
+\end{figure*}
 
-The property profiles along the path are shown in Fig.~\ref{fig:path-profiles}.
-The linear CTE rises at every step, from \(5.03\) to \(9.28\times10^{-6}\)~K\(^{-1}\)
-at \(600^{\circ}\)C and from \(5.06\) to \(9.36\times10^{-6}\)~K\(^{-1}\) at
-\(650^{\circ}\)C, in nearly equal increments between \(0.19\) and
-\(0.28\times10^{-6}\)~K\(^{-1}\). The total expansion change is thus divided over
-sixteen interfaces, each carrying less than a tenth of the difference of about
-\(8\times10^{-6}\)~K\(^{-1}\) found at a direct tungsten-steel
-joint~\cite{fgmWsteelCGS2022}. The solidus falls at every step, from \(3449\) to
-\(2262\)~K, with the largest drops (\(150\)-\(160\)~K) in the two tungsten-rich
-first steps and drops of \(50\)--\(90\)~K over the rest of the path, so that every
-layer has a melting point at least as high as the layers behind it.
+The path divides the expansion change of the wall into sixteen small, same-signed
+steps (Fig.~\ref{fig:path-profiles}). The linear CTE rises at every step, from
+\(5.03\) to \(9.28\times10^{-6}\)~K\(^{-1}\) at \(600^{\circ}\)C and from \(5.06\) to
+\(9.36\times10^{-6}\)~K\(^{-1}\) at \(650^{\circ}\)C, in nearly equal increments of
+\(0.19\)--\(0.28\times10^{-6}\)~K\(^{-1}\). The largest step is less than a
+twenty-fifth of the mismatch of about \(8\times10^{-6}\)~K\(^{-1}\) at a direct
+tungsten--steel joint~\cite{fgmWsteelCGS2022}. The solidus falls at every step, from
+\(3449\) to \(2262\)~K, most steeply (\(150\)--\(160\)~K per step) in the first two
+tungsten-rich layers, so every layer melts at a temperature at least as high as the
+layers behind it, matching the temperature drop through the wall.
 
 \begin{figure}[H]
   \centering
@@ -175,16 +180,16 @@ layer has a melting point at least as high as the layers behind it.
   \label{fig:path-profiles}
 \end{figure}
 
-Two properties that were not constrained along the path also behave well. The Pugh
-ratio rises from \(2.00\) to \(3.03\) without a single decrease, so the layers become
-more ductile toward the structural side, as the material classes require at the
-ends. This follows from the composition change, since every step either removes
-tungsten or adds vanadium or titanium. The yield strength stays above the
-EUROFER97-level limits everywhere, with minima of \(307\)~MPa at \(600^{\circ}\)C and
-\(285\)~MPa at \(650^{\circ}\)C at the two ends, and peaks in the middle of the path,
-reaching \(824\)~MPa at \(600^{\circ}\)C for \ch{W55V35Ti5Re5}, where the mixing of W
-and V is greatest. The path crosses the material classes in order, eleven Material~A
-layers, two Material~AB layers, and four Material~B layers (Table~\ref{tab:path}).
+Properties that were not constrained along the path follow the same two-material
+logic. The Pugh ratio rises from \(2.00\) to \(3.03\) without a single decrease, so
+ductility increases toward the load-bearing side, because every step removes
+tungsten or adds vanadium or titanium. The yield strength exceeds the EUROFER97-level
+limits on every layer, with minima of \(307\)~MPa at \(600^{\circ}\)C and
+\(285\)~MPa at \(650^{\circ}\)C at the two terminals and a maximum of \(824\)~MPa at
+\(600^{\circ}\)C for \ch{W55V35Ti5Re5}, where W and V are most mixed, so the graded
+layers are stronger than either material they join. The path passes through the
+classes in order, eleven Material~A layers, two Material~AB layers, and four
+Material~B layers (Table~\ref{tab:path}).
 
 \begin{table*}[!t]
 \centering
@@ -220,14 +225,15 @@ Layer & Composition (at.\%) & Step & \(T_s\) (K) & \(\alpha_{600}\) & \(\alpha_{
 \end{tabular}
 \end{table*}
 
-The composition along the path is simple (Fig.~\ref{fig:path-composition}).
-Despite the path being planned in an eleven-element space, the final path contains
-only four elements, W, V, Ti, and Re. Tungsten falls from \(90\) to \(15\)~at.\% and vanadium
-rises from \(5\) to \(75\)~at.\% across the path, titanium enters at \(5\)~at.\% in
-the second step and rises to \(10\)~at.\% near the structural end, and rhenium stays
-at \(5\)~at.\% until it is removed in the final step. In practice the gradient can be
-deposited mainly by varying the W and V feeds, with fixed Re and Ti additions changed
-only three times along the path.
+The path is also simple to build (Fig.~\ref{fig:path-composition}). Although it was
+planned in an eleven-element space, it uses only W, V, Ti, and Re: tungsten falls
+from \(90\) to \(15\)~at.\% as vanadium rises from \(5\) to \(75\)~at.\%, titanium
+enters at \(5\)~at.\% in the second step and rises to \(10\)~at.\% near the
+structural end, and rhenium stays at \(5\)~at.\% until the final step. The gradient
+can thus be deposited mainly by varying the W and V feeds, with the Ti and Re
+additions changed only three times. Iron is absent from every layer, so the
+tungsten--iron intermetallics that limit conventional tungsten-to-steel gradients
+cannot form anywhere along the wall.
 
 \begin{figure}[H]
   \centering
@@ -239,15 +245,16 @@ only three times along the path.
   \label{fig:path-composition}
 \end{figure}
 
-These results also highlight a key limitation of the methods employed. The
-properties used here are model estimates: the yield strength from the
-Maresca--Curtin model, the Pugh ratio from a rule of mixtures, and the solidus and
-CTE from CALPHAD. They are suited to ranking compositions and to setting the
-direction of the gradient, but the absolute values along the path, in particular
-the CTE and solidus of the vanadium-rich layers, should be confirmed by
-measurement on the terminal alloys and selected intermediate layers before the
-gradient is built. In addition, the path ensures that the CTE changes in one
-direction only, but the thermal stresses in the graded wall were not computed.
-Such an analysis would require the layer thicknesses and the through-wall
-temperature field, and was considered outside the scope of this work, as it would
-not change the path design methodology demonstrated here.
+Together, these results show that the two materials of the first wall can be joined
+by a single-phase, reduced-activation gradient in which every requirement holds
+layer by layer, and that the two monotonicity requirements cost nothing in the
+number of layers. Two limitations apply. First, the properties are model estimates,
+the yield strength from the Maresca--Curtin model, the Pugh ratio from a rule of
+mixtures, and the solidus and CTE from CALPHAD; they are suited to ranking
+compositions and setting the direction of the gradient, but the values along the
+path, in particular for the vanadium-rich layers, should be confirmed by measurement
+on the terminal alloys and selected intermediate layers before the gradient is
+built. Second, the path ensures that the CTE changes in one direction only, but the
+thermal stresses in the graded wall were not computed; such an analysis requires
+the layer thicknesses and the through-wall temperature field and was considered
+outside the scope of this work, as it would not change the path design methodology.

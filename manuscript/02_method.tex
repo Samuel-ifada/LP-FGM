@@ -16,11 +16,17 @@ irradiation-induced phenomena across the design space.
 The responses are evaluated under the irradiation conditions summarized in
 \Cref{tab:ind_variables}: a two-year irradiation time with decay times of one
 second, one month, and 100 years, corresponding to the immediate post-irradiation,
-maintenance, and long-term waste management scenarios. Under these conditions, the
-responses of pure W and EUROFER97 serve as reference baselines for plasma-facing
-and structural materials, respectively, and a composition is retained if each of
-its responses stays within a deviation factor of \(\phi=10\) of the corresponding
-baseline value.
+maintenance, and long-term waste management scenarios. Because the first wall
+combines two materials, two references are used: the responses of pure W serve as
+the baseline for plasma-facing compositions and those of EUROFER97 as the baseline
+for structural compositions, and a composition is retained if each of its responses
+stays within a deviation factor of \(\phi=10\) of the corresponding baseline value.
+Normalizing activation responses to reference materials is common in scoping
+studies of fusion materials~\cite{gilbert2017automated,gilbert2017waste}. The factor
+\(\phi=10\) is a design choice: an order-of-magnitude band that admits compositions
+whose activation is comparable to that of materials already accepted for the
+first wall, without implying that a specific regulatory limit is
+met~\cite{rocco1991criteria}.
 
 \begin{table}[H]
 \centering
@@ -68,7 +74,12 @@ The feasible region is thus obtained directly as \(P\) by linear programming, an
 the \(5\)~at.\% grid compositions inside it are enumerated without evaluating the
 infeasible majority of the grid. This is substantially faster than
 generate-and-filter and is not specific to FLARE, as the same construction applies
-to any screening model whose responses are linear in composition. The resulting
+to any screening model whose responses are linear in composition. Both approaches
+were benchmarked on the same machine, \textcolor{red}{[CPU model, number of cores,
+RAM, operating system]}, using \textcolor{red}{[Python version; LP solver and version,
+e.g., SciPy/HiGHS]}; wall-clock time was recorded for the complete screen of each
+reference and peak memory as the maximum resident set size of the process, with
+each run repeated \textcolor{red}{[\(n\)]} times. The resulting
 reduced-activation feasible space is the starting point for the property calculations
 and gradient path design that follow.
 
@@ -123,16 +134,18 @@ relations \(E=3B(1-2\nu)\) and \(G=E/2(1+\nu)\), the descriptor reduces to
 \frac{B}{G}=\frac{2\,(1+\bar{\nu})}{3\,(1-2\bar{\nu})}.
 \label{eq:pugh}
 \end{equation}
-A composition is considered intrinsically ductile when \(B/G \ge 2.6\), a stricter
-cutoff than the conventional \(B/G > 1.75\) criterion~\cite{singh2023ductility}.
-As a rule-of-mixtures estimate, this descriptor serves for screening only.
+Larger values of \(B/G\) indicate a greater tendency to deform plastically rather
+than fracture; the threshold used for structural compositions is given in
+Section~\ref{sec:joinable}. As a rule-of-mixtures estimate, this descriptor serves
+for screening only.
 
 Phase stability, melting behavior, and thermophysical properties were obtained with
 the CALPHAD method, in which the Gibbs free energy of every candidate phase is
 described by parametric models assessed from experimental and first-principles
 data and extrapolated to multicomponent
 alloys~\cite{li2023calphad,conway2022thermodynamic}. Calculations were performed
-with Thermo-Calc's TC-Python API and the TCHEA6 database, which is assessed for
+with Thermo-Calc~\cite{andersson2002thermocalc} through its TC-Python API and the
+TCHEA6 database, which is assessed for
 high-entropy and refractory multi-principal-element systems. Equilibrium phase
 fractions, including the BCC solid solution and competing intermetallic phases such
 as sigma, Laves, mu, and chi, were computed at \(500\), \(600\), and
@@ -155,7 +168,34 @@ f_{\mathrm{BCC}}(T) &\ge 0.98, \qquad T \in \{500,\, 600,\, 650\}~\si{\celsius},
 \label{eq:filters}
 \end{equation}
 where \(f_{\mathrm{BCC}}\) is the BCC phase fraction and \(\kappa\) is the thermal
-conductivity. Following the graph representations of previous CGA design
+conductivity. Both criteria apply to every layer of the wall, on either side. A
+single disordered BCC solid solution is required because sigma, mu, Laves, and
+ordered phases are hard intermetallics that embrittle refractory alloys, and
+single-phase stability is the standard first filter in high-throughput refractory
+alloy design~\cite{senkov2015accelerated,senkov2018review,vela2023highthroughput}.
+The three temperatures bracket the service window of the wall: EUROFER97 is limited
+to about \SIrange{350}{550}{\celsius}, advanced structural steels target
+\SIrange{600}{650}{\celsius}, and the bulk of tungsten armour is best held between
+about \(600\) and \(\SI{650}{\celsius}\), below which embrittlement and above which
+irradiation swelling become
+limiting~\cite{zinkle2000operating,stork2014developing,zinkle2017development}. The
+fraction \(0.98\), rather than unity, is a design choice that tolerates up to
+\(2\)~mol\% of minor phases arising from the numerical tolerance of the equilibrium
+calculation, while excluding any meaningful intermetallic fraction. The
+conductivity criterion ensures that every layer can pass the surface heat flux to
+the coolant without excessive thermal stress, since the thermal-stress figure of
+merit of a wall material, \(M=\sigma_U\,\kappa\,(1-\nu)/(\alpha E)\), where
+\(\sigma_U\) is the ultimate tensile strength and \(E\) the Young's modulus,
+increases in proportion to \(\kappa\)~\cite{zinkle2000operating}. The value of
+\(\SI{16}{\watt\per\meter\per\kelvin}\) is a lower bound set at the level of
+austenitic stainless steel~\cite{kim1975thermophysical}, compared with about \(28\)
+for EUROFER97~\cite{tavassoli2004materials} and about
+\(\SI{175}{\watt\per\meter\per\kelvin}\) for tungsten~\cite{tolias2017analytical},
+and lies between the relaxed and strict limits of \(10\) and
+\(\SI{20}{\watt\per\meter\per\kelvin}\) used in earlier refractory alloy
+design~\cite{khatamsaz2023bayesian}.
+
+Following the graph representations of previous CGA design
 work~\cite{multiterminalCGA2024,obrist2026graph}, the surviving compositions were
 organized into a simplex-lattice graph~\cite{nimplex}, in which two compositions
 \(u\) and \(v\) are neighbors when
@@ -170,10 +210,12 @@ into connected subgraphs. The largest subgraph offers the widest contiguous spac
 for a gradient and is carried forward as the design
 region~\cite{obrist2026graph}.
 
-\textbf{Material classes and terminal alloys.} Each composition of the design
-region is classified by the requirements of the two sides of the first wall. A
-composition is a plasma-facing candidate, Material~A, or a structural candidate,
-Material~B, when
+\textbf{Material classes and terminal alloys.} The first wall is a two-material
+system (Fig.~\ref{fig:wall}): a plasma-facing material, Material~A, faces the plasma,
+and a structural material, Material~B, carries the load, with the graded layers
+joining them. Each composition of the design region is therefore classified by the
+requirements of the side it could serve. A composition is a plasma-facing
+candidate, Material~A, or a structural candidate, Material~B, when
 \begin{equation}
 \begin{aligned}
 &\text{Material A:} && T_s > \SI{2200}{\celsius}
@@ -183,12 +225,46 @@ Material~B, when
 \end{aligned}
 \label{eq:classes}
 \end{equation}
-where \(\sigma_y^{T}\) is the yield strength at \(T\)~\si{\celsius}. The strength
-limits are set at the level of the reference structural steel
-EUROFER97~\cite{lindau2005eurofer}, so that every candidate is at least as strong as
-the steel it would replace at the service temperatures. Compositions satisfying
-both definitions form Material~AB, and those satisfying neither are classified as
-Intermediate. As in previous CGA design studies, in which the terminal alloys are
+where \(\sigma_y^{T}\) is the yield strength at \(T\)~\si{\celsius}. Each threshold
+follows from the function of its side. Material~A faces the plasma heat flux and
+transient loads that can melt the surface~\cite{linke2019pfc,Pitts2019}, so a high
+melting point is its primary requirement~\cite{PFMscreeningPRX2024}. The limit
+\(T_s > \SI{2200}{\celsius}\) is a design choice, \(\SI{200}{\celsius}\) stricter
+than the \(\SI{2000}{\celsius}\) used in earlier refractory alloy design for
+\(\SI{1300}{\celsius}\) service~\cite{vela2023highthroughput,khatamsaz2023bayesian},
+which followed the rule that the service temperature should not exceed about
+two-thirds of the absolute melting temperature. By the same rule,
+\(T_s = \SI{2200}{\celsius} = \SI{2473}{\kelvin}\) permits operation up to
+\(\tfrac{2}{3}\times\SI{2473}{\kelvin} \approx \SI{1649}{\kelvin}\)
+(\(\approx\SI{1376}{\celsius}\)), above the temperature at which tungsten
+recrystallizes~\cite{stork2014developing}. The limit also excludes V- and Cr-rich
+compositions, since pure V and Cr melt at about \(\SI{1910}{\celsius}\)~\cite{haynes2016crc},
+so that Material~A is tungsten-rich. Material~B carries the mechanical load and must
+deform plastically rather than fracture. Inverting \Cref{eq:pugh} relates the
+ductility threshold to the Poisson ratio,
+\begin{equation}
+\bar{\nu}=\frac{3\,(B/G)-2}{6\,(B/G)+2}.
+\label{eq:nu}
+\end{equation}
+Pugh's criterion takes \(B/G > 1.75\) (\(\bar{\nu} > 0.26\)) as ductile for pure
+metals~\cite{pugh1954}, and a shear-to-bulk modulus ratio \(G/B\) below
+\(0.41\)--\(0.43\), that is \(B/G\) above about \(2.3\)--\(2.4\)
+(\(\bar{\nu} \gtrsim 0.31\)--\(0.32\)), separates plastic from brittle behaviour in
+metallic glasses~\cite{lewandowski2005intrinsic}. The limit \(B/G \ge 2.6\)
+(\(\bar{\nu} \ge 0.33\)) is a design choice that adds margin above these anchors,
+because the rule-of-mixtures estimate neglects the electronic and chemical effects
+that make refractory alloys
+brittle~\cite{singh2023ductility,senkov2021generalization}. The strength limits are
+set by EUROFER97, the structural steel the wall would otherwise use: its average
+\(0.2\%\) yield strength is \SIrange{260}{300}{\mega\pascal} at
+\(\SI{600}{\celsius}\) and \SIrange{190}{230}{\mega\pascal} at
+\(\SI{650}{\celsius}\)~\cite{lucon2007overview,gaganidze2018development}, so every
+candidate is at least as strong as EUROFER97. Material~A is evaluated at
+\(\SI{600}{\celsius}\), the lower end of the window for the bulk of tungsten armour,
+and Material~B at \(\SI{650}{\celsius}\), the target temperature of advanced
+structural alloys~\cite{stork2014developing,zinkle2017development}. Compositions
+satisfying both definitions form Material~AB, and those satisfying neither are
+classified as Intermediate. As in previous CGA design studies, in which the terminal alloys are
 fixed by the application~\cite{kirk2021monotonic,multiterminalCGA2024}, the two
 terminals are chosen by the function of each side of the wall. The plasma-facing
 (PFM) terminal is the highest-solidus composition of Material~A or AB, and the
