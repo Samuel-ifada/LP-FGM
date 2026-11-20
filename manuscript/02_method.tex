@@ -13,6 +13,19 @@ damage, decay heat, and contact dose rate, as a composition-weighted sum of
 precomputed elemental contributions, providing a quantitative basis for assessing
 irradiation-induced phenomena across the design space.
 
+Inventory codes such as FISPACT-II~\cite{sublet2017fispact} compute activation
+responses by solving the coupled transmutation and decay equations for every
+nuclide produced during irradiation and cooling. A single calculation takes from
+seconds to minutes~\cite{rsicc2020fispact}, and a separate calculation is required
+for each composition, so screening the 30,045,015 compositions of the
+\(5\)~at.\% grid in this way would require about 30 million inventory
+calculations. \emph{FLARE} avoids repeating these calculations: the elemental
+responses are computed once, and the responses of any alloy follow as their
+composition-weighted sum~\cite{Marquez2026FLARE}. This linearity also allows each
+screening limit to be written as a linear inequality (\cref{eq:polytope}), so that
+the reduced-activation region is obtained by linear programming rather than by
+evaluating every composition.
+
 The responses are evaluated under the irradiation conditions summarized in
 \Cref{tab:ind_variables}: a two-year irradiation time with decay times of one
 second, one month, and 100 years, corresponding to the immediate post-irradiation,

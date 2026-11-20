@@ -18,9 +18,8 @@ use is limited to an operating window of roughly \(350\)--\(550\)~\(^{\circ}\)C,
 bounded below by irradiation embrittlement and above by thermal
 creep~\cite{zinkle2000operating}. Both materials must also remain acceptably
 activated through operation and decommissioning~\cite{bloom2007critical}. As no
-single material satisfies the surface and structural requirements simultaneously,
-the first wall must be built from a plasma-facing material and a structural
-material joined into one component.
+single material meets both the surface and structural requirements, the two must
+be joined into one component.
 
 Joining these materials is a central difficulty. Tungsten and steel differ
 markedly in thermal expansion, with coefficients of roughly \(4.4\) and
@@ -38,33 +37,30 @@ which the alloy composition varies gradually from one terminal alloy to another,
 spreads the expansion mismatch over a graded region rather than a single boundary,
 and graded interlayers have been shown to reduce the stresses in W--EUROFER
 first-wall components~\cite{fgmWEurofer2015,heuer2018eurofer}. Such gradients are
-now practically realizable, as additive manufacturing (AM) processes such as
+now realizable, as additive manufacturing (AM) processes such as
 directed energy deposition and laser powder bed fusion can vary the composition
 layer by layer~\cite{karim2024wire,lee2024lpbf}.
 
-Despite these advances in manufacturing capability, grading alone does not avoid
-the intermetallics, since iron and tungsten still meet across the gradient. One
-remedy is to keep the transition a single body-centered cubic (BCC) solid solution
-at every layer, so that the gradient never enters the composition ranges where the
-brittle phases are stable~\cite{fgmWsteelInterlayerBCC2023}. This choice changes
-the structural terminal itself. Rather than grading toward a steel, the gradient can
-terminate in a vanadium-rich structural alloy. Vanadium alloys, in particular
+Grading alone, however, does not avoid the intermetallics, since iron and tungsten
+still meet across the gradient. One remedy is to keep the transition a single
+body-centered cubic (BCC) solid solution at every layer, so that the gradient never
+enters the composition ranges where the brittle phases are
+stable~\cite{fgmWsteelInterlayerBCC2023}. The gradient can then terminate in a
+vanadium-rich structural alloy rather than a steel. Vanadium alloys, in particular
 V-4Cr-4Ti, have long been considered fusion structural materials because of their
 low activation, good high-temperature strength, and high thermal
 conductivity~\cite{smith1995vanadium,muroga2002vanadium,kurtz2004vanadium}, and
 graded transitions from V-4Cr-4Ti have recently been deposited by directed energy
 deposition~\cite{ebeperi2025ded}. Like tungsten, vanadium is BCC, so a W-to-V
-gradient can in principle remain a single BCC solid solution throughout, with iron
-and tungsten never meeting along the transition. Existing realizations, however,
-rely on a few interlayers selected by hand, one composition at a
-time~\cite{fgmWsteelInterlayerBCC2023}. Identifying such a path by inspection is a
-fundamentally limited approach, since the constraints interact across a composition
-space far too large to visualize.
+gradient can in principle remain a single BCC solid solution throughout. Existing
+realizations, however, rely on a few interlayers selected by hand, one composition
+at a time~\cite{fgmWsteelInterlayerBCC2023}, an approach that is limited because the
+constraints interact across a composition space too large to inspect.
 
 The constraints are also numerous. The plasma-facing side requires high-temperature
 capability and the structural side requires ductility, while reduced activation, a
 stable single-phase structure, adequate thermal conductivity, and sufficient
-strength must be met by both terminals and every intermediate layer alike.
+strength must be met at every layer, the terminals included.
 Multicomponent refractory alloys offer wide freedom to balance these
 demands~\cite{Senkov2010,senkov2018review}. Tungsten-based high-entropy alloys have
 shown outstanding resistance to irradiation
@@ -140,10 +136,9 @@ The gradient path between the two terminal alloys is then planned on the
 composition graph with the cost function of Kirk et al.~\cite{kirk2021monotonic},
 with monotonicity in both CTE and solidus imposed as hard constraints. Under these
 constraints the cost reduces to path length, and the optimal path is found exactly
-by Dijkstra's algorithm, with no penalty weight to tune. The approach improves upon
-previous work by enabling monotonicity in more than one property at once while
-every layer remains reduced in activation, single-phase, and at least as strong as
-EUROFER97.
+by Dijkstra's algorithm, with no penalty weight to tune. Unlike previous work, the
+approach imposes monotonicity in two properties at once while every layer remains
+reduced-activation, single-phase, and at least as strong as EUROFER97.
 
 The remainder of this paper is organized as follows. First, the activation
 screening, property calculations, and gradient path design problem are described in
